@@ -2,7 +2,9 @@ package pl.polsl.task.manager.rest.api.services;
 
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
+import pl.polsl.task.manager.rest.api.exceptions.NotFoundException;
 import pl.polsl.task.manager.rest.api.models.Admin;
+import pl.polsl.task.manager.rest.api.models.Role;
 import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.repositories.RoleRepository;
 import pl.polsl.task.manager.rest.api.repositories.UserRepository;
@@ -27,7 +29,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(Long id) {
-        return userRepository.getOne(id);
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException(User.class, id));
     }
 
     @Override
@@ -52,9 +54,11 @@ public class UserServiceImpl implements UserService {
             throw new ForbiddenAccessException("Only administrator can change roles");
         if (user instanceof Admin)
             throw new ForbiddenAccessException("Cannot change role of other administrator");
-        if (userRolePatch.getRoleCode() != null)
-            user.setRole(roleRepository.getOne(userRolePatch.getRoleCode()));
-        else
+        if (userRolePatch.getRoleCode() != null) {
+            Role role = roleRepository.findById(userRolePatch.getRoleCode())
+                    .orElseThrow(() -> new NotFoundException(Role.class, userRolePatch.getRoleCode()));
+            user.setRole(role);
+        } else
             user.setRole(null);
         userRepository.updateRole(user.getId(), roleClassNameFactory.getClassName(userRolePatch.getRoleCode()));
         return userRepository.save(user);

@@ -8,7 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import pl.polsl.task.manager.rest.api.exceptions.NotAuthorizedActionException;
+import pl.polsl.task.manager.rest.api.exceptions.NotAuthorizedException;
 import pl.polsl.task.manager.rest.api.exceptions.UsernameAlreadyUsedException;
 import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.repositories.UserRepository;
@@ -70,9 +70,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public User getUserFromHeader(String token) {
         try {
             String userName = getClaimFromToken(token, Claims::getSubject);
-            return userRepository.findByUsername(userName).orElseThrow(() -> new NotAuthorizedActionException("token does not match any user"));
+            return userRepository.findByUsername(userName).orElseThrow(() -> new NotAuthorizedException("Token does not match any user"));
         }catch (Exception e){
-            throw new NotAuthorizedActionException("unknown error");
+            throw new NotAuthorizedException(e.getMessage());
         }
     }
 
@@ -95,9 +95,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationPost.getUsername(), authenticationPost.getPassword()));
             UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationPost.getUsername());
             String token = generateToken(userDetails);
-            return new AuthenticationView(token, getExpirationDateFromToken(token));
+            AuthenticationView authenticationView = new AuthenticationView();
+            authenticationView.setToken(token);
+            authenticationView.setExpirationDate(getExpirationDateFromToken(token));
+            return authenticationView;
         }  catch (Exception e){
-            throw new NotAuthorizedActionException("wrong credentials");
+            throw new NotAuthorizedException("Wrong credentials");
         }
     }
 

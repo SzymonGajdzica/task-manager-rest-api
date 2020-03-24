@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -35,10 +36,12 @@ public class ActivityView {
     private String result;
 
     @ApiModelProperty(required = true, position = 5)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @NonNull
     private Date registerDate;
 
     @ApiModelProperty(required = true, position = 6)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Nullable
     private Date endDate;
 

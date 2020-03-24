@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @ToString
-public class User extends BaseModelWithId {
+public class User extends BaseEntityWithId {
 
     @Column(name = "name", nullable = false)
     @NonNull

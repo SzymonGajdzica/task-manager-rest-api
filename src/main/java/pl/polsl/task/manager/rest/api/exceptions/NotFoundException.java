@@ -1,12 +1,16 @@
 package pl.polsl.task.manager.rest.api.exceptions;
 
+import pl.polsl.task.manager.rest.api.models.BaseEntityWithCode;
+import pl.polsl.task.manager.rest.api.models.BaseEntityWithId;
+
 public class NotFoundException extends RuntimeException {
 
-    public NotFoundException(Long id) {
-        super("Could not find item with id = " + id);
+    public NotFoundException(Class<? extends BaseEntityWithCode> resourceClass, String code) {
+        super("Could not found " + resourceClass.getSimpleName() + " with code " + code);
     }
-    public NotFoundException(String code) {
-        super("Could not find item with code = " + code);
+
+    public NotFoundException(Class<? extends BaseEntityWithId> resourceClass, Long id) {
+        super("Could not found " + resourceClass.getSimpleName() + " with id " + id);
     }
 
 }

@@ -14,7 +14,7 @@ import javax.persistence.MappedSuperclass;
 @Data
 @NoArgsConstructor
 @ToString
-public class BaseModelWithCode {
+public class BaseEntityWithCode {
 
     @Id
     @NonNull

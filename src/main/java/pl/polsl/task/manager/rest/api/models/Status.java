@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @ToString
 @Entity
 @Table(name = "action_statuses")
-public class Status extends BaseModelWithCode {
+public class Status extends BaseEntityWithCode {
 
     @Column(name = "name", nullable = false)
     @NonNull

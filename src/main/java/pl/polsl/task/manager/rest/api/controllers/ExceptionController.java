@@ -12,16 +12,9 @@ import pl.polsl.task.manager.rest.api.views.ExceptionView;
 public class ExceptionController {
 
     @ResponseBody
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ExceptionView notFoundHandler(NotFoundException e) {
-        return generateBasicMessage(e);
-    }
-
-    @ResponseBody
-    @ExceptionHandler(NotAuthorizedActionException.class)
+    @ExceptionHandler(NotAuthorizedException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
-    public ExceptionView notAuthorizedActionHandler(NotAuthorizedActionException e) {
+    public ExceptionView notAuthorizedActionHandler(NotAuthorizedException e) {
         return generateBasicMessage(e);
     }
 
@@ -33,30 +26,16 @@ public class ExceptionController {
     }
 
     @ResponseBody
-    @ExceptionHandler(UsernameAlreadyUsedException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ExceptionView usernameAlreadyUsedHandler(UsernameAlreadyUsedException e) {
-        return generateBasicMessage(e);
-    }
-
-    @ResponseBody
-    @ExceptionHandler(WrongRequestBodyException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ExceptionView wrongRequestBodyHandler(WrongRequestBodyException e) {
-        return generateBasicMessage(e);
-    }
-
-    @ResponseBody
-    @ExceptionHandler(EmptyRequestBodyException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ExceptionView emptyRequestBodyHandler(EmptyRequestBodyException e) {
-        return generateBasicMessage(e);
-    }
-
-    @ResponseBody
     @ExceptionHandler(NotImplementedException.class)
     @ResponseStatus(value = HttpStatus.NOT_IMPLEMENTED)
     public ExceptionView notImplementedHandler(NotImplementedException e) {
+        return generateBasicMessage(e);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(UsernameAlreadyUsedException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ExceptionView usernameAlreadyUsedHandler(UsernameAlreadyUsedException e) {
         return generateBasicMessage(e);
     }
 
@@ -67,8 +46,18 @@ public class ExceptionController {
         return generateBasicMessage(e);
     }
 
+    @ResponseBody
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public ExceptionView entityNotFoundExceptionHandler(NotFoundException e) {
+        return generateBasicMessage(e);
+    }
+
     private ExceptionView generateBasicMessage(Exception e){
-        return new ExceptionView(e.getClass().getSimpleName(), e.getMessage());
+        ExceptionView exceptionView = new ExceptionView();
+        exceptionView.setException(e.getClass().getSimpleName());
+        exceptionView.setMessage(e.getMessage());
+        return exceptionView;
     }
 
 

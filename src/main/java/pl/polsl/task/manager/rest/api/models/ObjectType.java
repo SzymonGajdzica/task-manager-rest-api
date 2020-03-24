@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ToString
-public class ObjectType extends BaseModelWithCode {
+public class ObjectType extends BaseEntityWithCode {
 
     @Column(name = "name", nullable = false)
     @NonNull

@@ -1,22 +1,30 @@
 package pl.polsl.task.manager.rest.api.views;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
 
+import java.util.Date;
+
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class ExceptionView {
 
     @ApiModelProperty(required = true, example = "NotAuthorizedException")
-    @Setter(AccessLevel.NONE)
     @NonNull
-    private String title;
+    private String exception;
 
     @ApiModelProperty(required = true, example = "Not allowed to execute this request", position = 1)
-    @Setter(AccessLevel.NONE)
     @NonNull
-    private String description;
+    private String message;
+
+    @ApiModelProperty(required = true, position = 2)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @NonNull
+    private Date timestamp = new Date();
 
 }

@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ToString
-public class ActivityType extends BaseModelWithCode {
+public class ActivityType extends BaseEntityWithCode {
 
     @Column(name = "name", nullable = false)
     @NonNull

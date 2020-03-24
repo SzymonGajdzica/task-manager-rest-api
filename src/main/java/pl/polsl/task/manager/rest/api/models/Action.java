@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -17,7 +18,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @ToString
-public class Action extends BaseModelWithId {
+public class Action extends BaseEntityWithId {
 
     @Column(name = "description")
     @Nullable
@@ -32,6 +33,7 @@ public class Action extends BaseModelWithId {
     private String result;
 
     @Column(name = "register_date", nullable = false)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @NonNull
     private Date registerDate = new Date();
 

@@ -1,8 +1,8 @@
 package pl.polsl.task.manager.rest.api.views;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
@@ -10,7 +10,7 @@ import org.springframework.lang.NonNull;
 import java.util.Date;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class AuthenticationView {
 
