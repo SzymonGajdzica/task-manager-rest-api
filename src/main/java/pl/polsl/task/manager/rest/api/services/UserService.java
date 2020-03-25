@@ -9,9 +9,6 @@ import pl.polsl.task.manager.rest.api.views.UserView;
 public interface UserService {
 
     @NonNull
-    User getUser(Long id);
-
-    @NonNull
     User getUser(String token);
 
     @NonNull

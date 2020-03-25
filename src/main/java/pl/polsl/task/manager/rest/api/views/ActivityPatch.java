@@ -4,27 +4,22 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 @Data
 @NoArgsConstructor
 @ToString
-public class ActivityPost {
+public class ActivityPatch {
 
     @ApiModelProperty(example = "Fix integer types")
     @Nullable
     private String description;
 
-    @ApiModelProperty(required = true, position = 1)
-    @NonNull
-    private Long requestId;
-
-    @ApiModelProperty(example = "REF", position = 2)
+    @ApiModelProperty(example = "REF", position = 1)
     @Nullable
     private String activityTypeCode;
 
-    @ApiModelProperty(position = 3)
+    @ApiModelProperty(position = 2)
     @Nullable
     private Long workerId;
 

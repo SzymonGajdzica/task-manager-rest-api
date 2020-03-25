@@ -45,8 +45,8 @@ public class ActivityView {
     @Nullable
     private Date endDate;
 
-    @ApiModelProperty(required = true, example = "REF", position = 7)
-    @NonNull
+    @ApiModelProperty(example = "REF", position = 7)
+    @Nullable
     private String activityCode;
 
     @ApiModelProperty(position = 8)

@@ -1,6 +1,5 @@
 package pl.polsl.task.manager.rest.api.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -10,7 +9,7 @@ import pl.polsl.task.manager.rest.api.models.User;
 import java.util.Optional;
 
 @RepositoryRestResource
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends BaseIdRepository<User> {
 
     Optional<User> findByUsername(String userName);
 

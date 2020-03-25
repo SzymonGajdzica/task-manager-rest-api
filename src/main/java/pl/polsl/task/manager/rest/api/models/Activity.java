@@ -24,7 +24,7 @@ public class Activity extends Action {
     private Worker worker;
 
     @ManyToOne(optional = false)
-    @NonNull
+    @Nullable
     private ActivityType activityType;
 
     @ManyToOne(optional = false)

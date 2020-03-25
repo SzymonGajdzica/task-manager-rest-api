@@ -2,9 +2,7 @@ package pl.polsl.task.manager.rest.api.services;
 
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
-import pl.polsl.task.manager.rest.api.exceptions.NotFoundException;
 import pl.polsl.task.manager.rest.api.models.Admin;
-import pl.polsl.task.manager.rest.api.models.Role;
 import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.repositories.RoleRepository;
 import pl.polsl.task.manager.rest.api.repositories.UserRepository;
@@ -28,11 +26,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new NotFoundException(User.class, id));
-    }
-
-    @Override
     public User getUser(String token) {
         return authenticationService.getUserFromToken(token);
     }
@@ -52,16 +45,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch) {
         User currentUser = getUser(token);
-        User userToUpdate = getUser(userId);
+        User userToUpdate = userRepository.getById(userId);
         if (!(currentUser instanceof Admin))
             throw new ForbiddenAccessException(Admin.class);
         if (userToUpdate instanceof Admin)
             throw new ForbiddenAccessException("Cannot change role of other administrator");
-        if (userRolePatch.getRoleCode() != null) {
-            Role role = roleRepository.findById(userRolePatch.getRoleCode())
-                    .orElseThrow(() -> new NotFoundException(Role.class, userRolePatch.getRoleCode()));
-            userToUpdate.setRole(role);
-        } else
+        if (userRolePatch.getRoleCode() != null)
+            userToUpdate.setRole(roleRepository.getById(userRolePatch.getRoleCode()));
+        else
             userToUpdate.setRole(null);
         userRepository.updateRole(userToUpdate.getId(), roleClassNameFactory.getClassName(userRolePatch.getRoleCode()));
         return userRepository.save(userToUpdate);
