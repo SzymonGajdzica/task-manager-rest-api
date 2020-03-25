@@ -2,6 +2,7 @@ package pl.polsl.task.manager.rest.api.services;
 
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
+import pl.polsl.task.manager.rest.api.models.Admin;
 import pl.polsl.task.manager.rest.api.models.Manager;
 import pl.polsl.task.manager.rest.api.models.Request;
 import pl.polsl.task.manager.rest.api.models.User;
@@ -17,18 +18,21 @@ public class RequestServiceImpl implements RequestService{
 
     private final RequestRepository requestRepository;
     private final StatusRepository statusRepository;
+    private final AuthenticationService authenticationService;
 
-    public RequestServiceImpl(RequestRepository requestRepository, StatusRepository statusRepository) {
+    public RequestServiceImpl(RequestRepository requestRepository, StatusRepository statusRepository, AuthenticationService authenticationService) {
         this.requestRepository = requestRepository;
         this.statusRepository = statusRepository;
+        this.authenticationService = authenticationService;
     }
 
     @Override
-    public Request createRequest(User user, RequestPost requestPost) {
-        if(!(user instanceof Manager))
-            throw new ForbiddenAccessException("Only manager can create request");
+    public Request createRequest(String token, RequestPost requestPost) {
+        User currentUser = authenticationService.getUserFromToken(token);
+        if(!(currentUser instanceof Manager))
+            throw new ForbiddenAccessException(Manager.class);
         Request request = new Request();
-        request.setManager((Manager) user);
+        request.setManager((Manager) currentUser);
         request.setDescription(requestPost.getDescription());
         request.setStatus(statusRepository.getOne("OPN"));
         return requestRepository.save(request);
@@ -48,10 +52,13 @@ public class RequestServiceImpl implements RequestService{
     }
 
     @Override
-    public List<Request> getAllRequests(User user) {
-        if(!(user instanceof Manager))
-            throw new ForbiddenAccessException("Only manager can browse requests");
-        return requestRepository.findAllByManagerId(user.getId());
+    public List<Request> getAllRequests(String token) {
+        User currentUser = authenticationService.getUserFromToken(token);
+        if (currentUser instanceof Manager)
+            return requestRepository.findAllByManagerId(currentUser.getId());
+        if (currentUser instanceof Admin)
+            return requestRepository.findAll();
+        throw new ForbiddenAccessException(Manager.class, Admin.class);
     }
 
 }

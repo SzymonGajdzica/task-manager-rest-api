@@ -15,12 +15,12 @@ public interface UserService {
     User getUser(String token);
 
     @NonNull
-    User getPatchedUser(User user, UserPatch userPatch);
+    User getPatchedUser(String token, UserPatch userPatch);
 
     @NonNull
-    User getUserWithPatchedRole(User currentUser, User user, UserRolePatch userRolePatch);
+    User getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch);
 
-    void removeUser(User user);
+    void removeUser(String token);
 
     @NonNull
     UserView serialize(User user);

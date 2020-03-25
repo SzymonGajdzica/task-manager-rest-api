@@ -67,7 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public User getUserFromHeader(String token) {
+    public User getUserFromToken(String token) {
         try {
             String userName = getClaimFromToken(token, Claims::getSubject);
             return userRepository.findByUsername(userName).orElseThrow(() -> new NotAuthorizedException("Token does not match any user"));

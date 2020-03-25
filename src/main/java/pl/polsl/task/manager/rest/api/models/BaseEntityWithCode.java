@@ -18,6 +18,6 @@ public class BaseEntityWithCode {
 
     @Id
     @NonNull
-    protected String code;
+    private String code;
 
 }

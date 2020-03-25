@@ -17,21 +17,24 @@ public class ActivityServiceImpl implements ActivityService {
     private final UserRepository userRepository;
     private final ActivityTypeRepository activityTypeRepository;
     private final StatusRepository statusRepository;
+    private final AuthenticationService authenticationService;
 
-    public ActivityServiceImpl(ActivityRepository activityRepository, RequestRepository requestRepository, UserRepository userRepository, ActivityTypeRepository activityTypeRepository, StatusRepository statusRepository) {
+    public ActivityServiceImpl(ActivityRepository activityRepository, RequestRepository requestRepository, UserRepository userRepository, ActivityTypeRepository activityTypeRepository, StatusRepository statusRepository, AuthenticationService authenticationService) {
         this.activityRepository = activityRepository;
         this.requestRepository = requestRepository;
         this.userRepository = userRepository;
         this.activityTypeRepository = activityTypeRepository;
         this.statusRepository = statusRepository;
+        this.authenticationService = authenticationService;
     }
 
     @Override
-    public Activity createActivity(User manager, ActivityPost activityPost) {
+    public Activity createActivity(String token, ActivityPost activityPost) {
+        User manager = authenticationService.getUserFromToken(token);
         Request request = requestRepository.findById(activityPost.getRequestId())
                 .orElseThrow(() -> new NotFoundException(Request.class, activityPost.getRequestId()));
         if(request.getManager() != manager)
-            throw new ForbiddenAccessException("Only that created request can add activities to it");
+            throw new ForbiddenAccessException("Only manager that created request can add activities to it");
         ActivityType activityType = activityTypeRepository.findById(activityPost.getActivityCode())
                 .orElseThrow(() -> new NotFoundException(ActivityType.class, activityPost.getActivityCode()));
         Activity activity = new Activity();

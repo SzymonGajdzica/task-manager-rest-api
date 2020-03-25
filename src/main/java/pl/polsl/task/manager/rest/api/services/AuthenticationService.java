@@ -9,7 +9,7 @@ import pl.polsl.task.manager.rest.api.views.UserPost;
 public interface AuthenticationService {
 
     @NonNull
-    User getUserFromHeader(String token);
+    User getUserFromToken(String token);
 
     @NonNull
     User registerUser(UserPost userPost);

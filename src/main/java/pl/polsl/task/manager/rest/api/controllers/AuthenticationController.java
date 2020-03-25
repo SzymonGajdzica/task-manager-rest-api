@@ -3,6 +3,7 @@ package pl.polsl.task.manager.rest.api.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.services.AuthenticationService;
 import pl.polsl.task.manager.rest.api.services.UserService;
 import pl.polsl.task.manager.rest.api.views.AuthenticationPost;
@@ -26,7 +27,8 @@ public class AuthenticationController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserView registerUser(@RequestBody UserPost userPost) {
-        return userService.serialize(authenticationService.registerUser(userPost));
+        User user = authenticationService.registerUser(userPost);
+        return userService.serialize(user);
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

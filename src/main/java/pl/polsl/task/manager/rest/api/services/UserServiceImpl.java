@@ -34,39 +34,43 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(String token) {
-        return authenticationService.getUserFromHeader(token);
+        return authenticationService.getUserFromToken(token);
     }
 
     @Override
-    public User getPatchedUser(User user, UserPatch userPatch) {
+    public User getPatchedUser(String token, UserPatch userPatch) {
+        User currentUser = getUser(token);
         if(userPatch.getName() != null)
-            user.setName(userPatch.getName());
+            currentUser.setName(userPatch.getName());
         if(userPatch.getSurname() != null)
-            user.setSurname(userPatch.getSurname());
+            currentUser.setSurname(userPatch.getSurname());
         if(userPatch.getEmail() != null)
-            user.setEmail(userPatch.getEmail());
-        return user;
+            currentUser.setEmail(userPatch.getEmail());
+        return currentUser;
     }
 
     @Override
-    public User getUserWithPatchedRole(User currentUser, User user, UserRolePatch userRolePatch) {
+    public User getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch) {
+        User currentUser = getUser(token);
+        User userToUpdate = getUser(userId);
         if (!(currentUser instanceof Admin))
-            throw new ForbiddenAccessException("Only administrator can change roles");
-        if (user instanceof Admin)
+            throw new ForbiddenAccessException(Admin.class);
+        if (userToUpdate instanceof Admin)
             throw new ForbiddenAccessException("Cannot change role of other administrator");
         if (userRolePatch.getRoleCode() != null) {
             Role role = roleRepository.findById(userRolePatch.getRoleCode())
                     .orElseThrow(() -> new NotFoundException(Role.class, userRolePatch.getRoleCode()));
-            user.setRole(role);
+            userToUpdate.setRole(role);
         } else
-            user.setRole(null);
-        userRepository.updateRole(user.getId(), roleClassNameFactory.getClassName(userRolePatch.getRoleCode()));
-        return userRepository.save(user);
+            userToUpdate.setRole(null);
+        userRepository.updateRole(userToUpdate.getId(), roleClassNameFactory.getClassName(userRolePatch.getRoleCode()));
+        return userRepository.save(userToUpdate);
     }
 
     @Override
-    public void removeUser(User user) {
-        userRepository.delete(user);
+    public void removeUser(String token) {
+        User currentUser = getUser(token);
+        userRepository.delete(currentUser);
     }
 
     @Override

@@ -21,6 +21,6 @@ public class BaseEntityWithId {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @NonNull
-    protected Long id;
+    private Long id;
 
 }

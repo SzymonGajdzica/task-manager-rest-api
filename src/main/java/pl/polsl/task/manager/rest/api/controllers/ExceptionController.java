@@ -40,6 +40,13 @@ public class ExceptionController {
     }
 
     @ResponseBody
+    @ExceptionHandler(CodeAlreadyUsedException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ExceptionView usernameAlreadyUsedHandler(CodeAlreadyUsedException e) {
+        return generateBasicMessage(e);
+    }
+
+    @ResponseBody
     @ExceptionHandler(WrongRequestException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ExceptionView wrongRequestHandler(WrongRequestException e) {
