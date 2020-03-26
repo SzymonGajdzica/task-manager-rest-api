@@ -8,7 +8,10 @@ import org.springframework.lang.NonNull;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.LinkedList;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Data
@@ -21,5 +24,13 @@ public class Status extends BaseEntityWithCode {
     @Column(name = "name", nullable = false)
     @NonNull
     private String name;
+
+    @ManyToMany
+    @NonNull
+    private List<Status> childStatuses = new LinkedList<>();
+
+    @ManyToMany
+    @NonNull
+    private List<Status> parentStatuses = new LinkedList<>();
 
 }

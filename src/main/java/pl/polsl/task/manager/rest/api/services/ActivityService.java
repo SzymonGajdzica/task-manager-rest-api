@@ -2,9 +2,9 @@ package pl.polsl.task.manager.rest.api.services;
 
 import org.springframework.lang.NonNull;
 import pl.polsl.task.manager.rest.api.models.Activity;
+import pl.polsl.task.manager.rest.api.views.ActionPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPost;
-import pl.polsl.task.manager.rest.api.views.ActivityProgressPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityView;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public interface ActivityService {
     Activity createActivity(String token, ActivityPost activityPost);
 
     @NonNull
-    Activity getPatchedActivityProgress(String token, Long activityId, ActivityProgressPatch activityProgressPatch);
+    Activity getPatchedActivity(String token, Long activityId, ActionPatch actionPatch);
 
     @NonNull
     Activity getPatchedActivity(String token, Long activityId, ActivityPatch activityPatch);
@@ -25,6 +25,8 @@ public interface ActivityService {
 
     @NonNull
     List<Activity> getWorkerActivities(String token);
+
+    void deleteActivity(String token, Long activityId);
 
     @NonNull
     ActivityView serialize(Activity activity);

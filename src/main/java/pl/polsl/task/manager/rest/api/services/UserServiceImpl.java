@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeUser(String token) {
+    public void deleteUser(String token) {
         User currentUser = getUser(token);
         userRepository.delete(currentUser);
     }

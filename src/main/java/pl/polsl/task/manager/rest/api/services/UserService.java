@@ -17,7 +17,7 @@ public interface UserService {
     @NonNull
     User getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch);
 
-    void removeUser(String token);
+    void deleteUser(String token);
 
     @NonNull
     UserView serialize(User user);

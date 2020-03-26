@@ -1,9 +1,12 @@
 package pl.polsl.task.manager.rest.api.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import pl.polsl.task.manager.rest.api.models.Request;
 import pl.polsl.task.manager.rest.api.services.RequestService;
+import pl.polsl.task.manager.rest.api.views.ActionPatch;
+import pl.polsl.task.manager.rest.api.views.RequestPatch;
 import pl.polsl.task.manager.rest.api.views.RequestPost;
 import pl.polsl.task.manager.rest.api.views.RequestView;
 import springfox.documentation.annotations.ApiIgnore;
@@ -30,9 +33,32 @@ public class RequestController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<RequestView> getAllRequests(@ApiIgnore @RequestHeader(value = "Authorization") String token) {
+    public List<RequestView> getRequests(@ApiIgnore @RequestHeader(value = "Authorization") String token) {
         List<Request> requests = requestService.getAllRequests(token);
         return requests.stream().map(requestService::serialize).collect(Collectors.toList());
+    }
+
+    @PatchMapping(value = "/progress/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public RequestView updateRequestProgress(@ApiIgnore @RequestHeader(value = "Authorization") String token,
+                                             @PathVariable Long requestId,
+                                             @RequestBody ActionPatch actionPatch) {
+        Request request = requestService.getPatchedRequest(token, requestId, actionPatch);
+        return requestService.serialize(request);
+    }
+
+    @PatchMapping(value = "/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public RequestView updateRequest(@ApiIgnore @RequestHeader(value = "Authorization") String token,
+                                     @PathVariable Long requestId,
+                                     @RequestBody RequestPatch requestPatch) {
+        Request request = requestService.getPatchedRequest(token, requestId, requestPatch);
+        return requestService.serialize(request);
+    }
+
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @DeleteMapping(value = "/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void deleteRequest(@ApiIgnore @RequestHeader(value = "Authorization") String token,
+                              @PathVariable Long requestId) {
+        requestService.deleteRequest(token, requestId);
     }
 
 

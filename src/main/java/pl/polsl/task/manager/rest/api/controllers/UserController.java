@@ -38,7 +38,7 @@ public class UserController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteUser(@ApiIgnore @RequestHeader(value = "Authorization") String token) {
-        userService.removeUser(token);
+        userService.deleteUser(token);
     }
 
     @PatchMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

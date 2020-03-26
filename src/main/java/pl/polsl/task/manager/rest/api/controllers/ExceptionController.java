@@ -34,14 +34,14 @@ public class ExceptionController {
 
     @ResponseBody
     @ExceptionHandler(UsernameAlreadyUsedException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
     public ExceptionView usernameAlreadyUsedHandler(UsernameAlreadyUsedException e) {
         return generateBasicMessage(e);
     }
 
     @ResponseBody
     @ExceptionHandler(CodeAlreadyUsedException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
     public ExceptionView usernameAlreadyUsedHandler(CodeAlreadyUsedException e) {
         return generateBasicMessage(e);
     }

@@ -9,14 +9,10 @@ import org.springframework.lang.Nullable;
 @Data
 @NoArgsConstructor
 @ToString
-public class ActivityProgressPatch {
+public class RequestPatch {
 
-    @ApiModelProperty(example = "OPN")
+    @ApiModelProperty(example = "There is problem with...")
     @Nullable
-    private String statusCode;
-
-    @ApiModelProperty(example = "Done!", position = 1)
-    @Nullable
-    private String result;
+    private String description;
 
 }

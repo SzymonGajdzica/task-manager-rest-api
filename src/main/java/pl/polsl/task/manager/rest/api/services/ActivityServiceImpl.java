@@ -8,12 +8,11 @@ import pl.polsl.task.manager.rest.api.models.Request;
 import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.models.Worker;
 import pl.polsl.task.manager.rest.api.repositories.*;
+import pl.polsl.task.manager.rest.api.views.ActionPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPost;
-import pl.polsl.task.manager.rest.api.views.ActivityProgressPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityView;
 
-import java.util.Date;
 import java.util.List;
 
 @Component
@@ -25,14 +24,16 @@ public class ActivityServiceImpl implements ActivityService {
     private final ActivityTypeRepository activityTypeRepository;
     private final StatusRepository statusRepository;
     private final AuthenticationService authenticationService;
+    private final ActionService actionService;
 
-    public ActivityServiceImpl(ActivityRepository activityRepository, RequestRepository requestRepository, UserRepository userRepository, ActivityTypeRepository activityTypeRepository, StatusRepository statusRepository, AuthenticationService authenticationService) {
+    public ActivityServiceImpl(ActivityRepository activityRepository, RequestRepository requestRepository, UserRepository userRepository, ActivityTypeRepository activityTypeRepository, StatusRepository statusRepository, AuthenticationService authenticationService, ActionService actionService) {
         this.activityRepository = activityRepository;
         this.requestRepository = requestRepository;
         this.userRepository = userRepository;
         this.activityTypeRepository = activityTypeRepository;
         this.statusRepository = statusRepository;
         this.authenticationService = authenticationService;
+        this.actionService = actionService;
     }
 
     @Override
@@ -45,27 +46,19 @@ public class ActivityServiceImpl implements ActivityService {
         updateActivityTypeAndWorker(activity, activityPost.getActivityTypeCode(), activityPost.getWorkerId());
         activity.setRequest(request);
         activity.setDescription(activityPost.getDescription());
-        activity.setStatus(statusRepository.getOne("OPN"));
+        activity.setStatus(actionService.getInitialStatus());
         return activityRepository.save(activity);
     }
 
     @Override
-    public Activity getPatchedActivityProgress(String token, Long activityId, ActivityProgressPatch activityProgressPatch) {
+    public Activity getPatchedActivity(String token, Long activityId, ActionPatch actionPatch) {
         User worker = authenticationService.getUserFromToken(token);
         Activity activity = activityRepository.getById(activityId);
         if (activity.getResult() != null)
             throw new BadRequestException("Cannot update progress in already finished activity");
         if (activity.getWorker() != worker)
             throw new ForbiddenAccessException("Only worker assigned to this activity can update its progress");
-        String statusCode = activityProgressPatch.getStatusCode();
-        String result = activityProgressPatch.getResult();
-        if (statusCode != null)
-            activity.setStatus(statusRepository.getById(statusCode));
-        if (result != null) {
-            activity.setResult(result);
-            activity.setEndDate(new Date());
-        }
-        return activityRepository.save(activity);
+        return activityRepository.save(actionService.getPatchAction(activity, actionPatch));
     }
 
     @Override
@@ -95,6 +88,15 @@ public class ActivityServiceImpl implements ActivityService {
         if (!(worker instanceof Worker))
             throw new BadRequestException("This request is designed for workers");
         return activityRepository.findAllByWorkerId(worker.getId());
+    }
+
+    @Override
+    public void deleteActivity(String token, Long activityId) {
+        User manager = authenticationService.getUserFromToken(token);
+        Activity activity = activityRepository.getById(activityId);
+        if (activity.getRequest().getManager() != manager)
+            throw new ForbiddenAccessException("Only manager that created request can remove it");
+        activityRepository.delete(activity);
     }
 
     private void updateActivityTypeAndWorker(Activity activity, String activityTypeCode, Long workerId) {
