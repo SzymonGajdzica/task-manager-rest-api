@@ -47,9 +47,9 @@ public class ExceptionController {
     }
 
     @ResponseBody
-    @ExceptionHandler(WrongRequestException.class)
+    @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ExceptionView wrongRequestHandler(WrongRequestException e) {
+    public ExceptionView wrongRequestHandler(BadRequestException e) {
         return generateBasicMessage(e);
     }
 

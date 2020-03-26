@@ -7,6 +7,8 @@ import pl.polsl.task.manager.rest.api.views.ActivityPost;
 import pl.polsl.task.manager.rest.api.views.ActivityProgressPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityView;
 
+import java.util.List;
+
 public interface ActivityService {
 
     @NonNull
@@ -17,6 +19,12 @@ public interface ActivityService {
 
     @NonNull
     Activity getPatchedActivity(String token, Long activityId, ActivityPatch activityPatch);
+
+    @NonNull
+    List<Activity> getRequestActivities(String token, Long requestId);
+
+    @NonNull
+    List<Activity> getWorkerActivities(String token);
 
     @NonNull
     ActivityView serialize(Activity activity);
