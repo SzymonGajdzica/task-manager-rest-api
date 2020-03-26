@@ -2,24 +2,24 @@ package pl.polsl.task.manager.rest.api.services;
 
 import org.springframework.lang.NonNull;
 import pl.polsl.task.manager.rest.api.models.ActivityType;
-import pl.polsl.task.manager.rest.api.views.ActivityTypePatch;
-import pl.polsl.task.manager.rest.api.views.ActivityTypePost;
-import pl.polsl.task.manager.rest.api.views.ActivityTypeView;
+import pl.polsl.task.manager.rest.api.views.CodeNamePatch;
+import pl.polsl.task.manager.rest.api.views.CodeNamePost;
+import pl.polsl.task.manager.rest.api.views.CodeNameView;
 
 import java.util.List;
 
 public interface ActivityTypeService {
 
     @NonNull
-    ActivityType createActivityType(String token, ActivityTypePost activityTypePost);
+    ActivityType createActivityType(String token, CodeNamePost codeNamePost);
 
     @NonNull
-    ActivityType getPatchedActivity(String token, String activityTypeCode, ActivityTypePatch activityTypePatch);
+    ActivityType getPatchedActivityType(String token, String activityTypeCode, CodeNamePatch codeNamePatch);
 
     @NonNull
-    List<ActivityType> getAllActivityTypes(String token);
+    List<ActivityType> getActivitiesTypes(String token);
 
     @NonNull
-    ActivityTypeView serialize(ActivityType activityType);
+    CodeNameView serialize(ActivityType activityType);
 
 }

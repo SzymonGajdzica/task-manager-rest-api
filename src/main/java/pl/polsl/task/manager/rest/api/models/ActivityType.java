@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.NonNull;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -19,11 +18,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ToString
-public class ActivityType extends BaseEntityWithCode {
-
-    @Column(name = "name", nullable = false)
-    @NonNull
-    private String name;
+public class ActivityType extends CodeName {
 
     @OneToMany(mappedBy = "activityType")
     @NonNull

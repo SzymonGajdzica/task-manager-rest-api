@@ -7,7 +7,10 @@ import pl.polsl.task.manager.rest.api.models.Activity;
 import pl.polsl.task.manager.rest.api.models.Request;
 import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.models.Worker;
-import pl.polsl.task.manager.rest.api.repositories.*;
+import pl.polsl.task.manager.rest.api.repositories.ActivityRepository;
+import pl.polsl.task.manager.rest.api.repositories.ActivityTypeRepository;
+import pl.polsl.task.manager.rest.api.repositories.RequestRepository;
+import pl.polsl.task.manager.rest.api.repositories.UserRepository;
 import pl.polsl.task.manager.rest.api.views.ActionPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPost;
@@ -22,16 +25,14 @@ public class ActivityServiceImpl implements ActivityService {
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final ActivityTypeRepository activityTypeRepository;
-    private final StatusRepository statusRepository;
     private final AuthenticationService authenticationService;
     private final ActionService actionService;
 
-    public ActivityServiceImpl(ActivityRepository activityRepository, RequestRepository requestRepository, UserRepository userRepository, ActivityTypeRepository activityTypeRepository, StatusRepository statusRepository, AuthenticationService authenticationService, ActionService actionService) {
+    public ActivityServiceImpl(ActivityRepository activityRepository, RequestRepository requestRepository, UserRepository userRepository, ActivityTypeRepository activityTypeRepository, AuthenticationService authenticationService, ActionService actionService) {
         this.activityRepository = activityRepository;
         this.requestRepository = requestRepository;
         this.userRepository = userRepository;
         this.activityTypeRepository = activityTypeRepository;
-        this.statusRepository = statusRepository;
         this.authenticationService = authenticationService;
         this.actionService = actionService;
     }
@@ -46,19 +47,19 @@ public class ActivityServiceImpl implements ActivityService {
         updateActivityTypeAndWorker(activity, activityPost.getActivityTypeCode(), activityPost.getWorkerId());
         activity.setRequest(request);
         activity.setDescription(activityPost.getDescription());
-        activity.setStatus(actionService.getInitialStatus());
+        activity.setActionStatus(actionService.getInitialStatus());
         return activityRepository.save(activity);
     }
 
     @Override
     public Activity getPatchedActivity(String token, Long activityId, ActionPatch actionPatch) {
-        User worker = authenticationService.getUserFromToken(token);
+        User user = authenticationService.getUserFromToken(token);
         Activity activity = activityRepository.getById(activityId);
         if (activity.getResult() != null)
             throw new BadRequestException("Cannot update progress in already finished activity");
-        if (activity.getWorker() != worker)
-            throw new ForbiddenAccessException("Only worker assigned to this activity can update its progress");
-        return activityRepository.save(actionService.getPatchAction(activity, actionPatch));
+        if (activity.getWorker() != user || activity.getRequest().getManager() != user)
+            throw new ForbiddenAccessException("Only worker assigned to activity and manager that created it can update its progress");
+        return activityRepository.save(actionService.getPatchedAction(activity, actionPatch));
     }
 
     @Override
@@ -112,17 +113,11 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public ActivityView serialize(Activity activity) {
-        ActivityView activityView = new ActivityView();
-        activityView.setId(activity.getId());
-        activityView.setDescription(activity.getDescription());
-        activityView.setEndDate(activity.getEndDate());
-        activityView.setRequestId(activity.getRequest().getId());
-        activityView.setRegisterDate(activity.getRegisterDate());
-        activityView.setResult(activity.getResult());
-        activityView.setStatusCode(activity.getStatus().getCode());
+        ActivityView activityView = actionService.serialize(activity, new ActivityView());
+        activityView.setStatusCode(activity.getActionStatus().getCode());
         if (activity.getWorker() != null)
             activityView.setWorkerId(activity.getWorker().getId());
-        if(activity.getActivityType() != null)
+        if (activity.getActivityType() != null)
             activityView.setActivityCode(activity.getActivityType().getCode());
         return activityView;
     }

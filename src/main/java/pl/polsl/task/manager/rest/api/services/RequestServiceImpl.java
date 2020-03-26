@@ -8,7 +8,6 @@ import pl.polsl.task.manager.rest.api.models.Manager;
 import pl.polsl.task.manager.rest.api.models.Request;
 import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.repositories.RequestRepository;
-import pl.polsl.task.manager.rest.api.repositories.StatusRepository;
 import pl.polsl.task.manager.rest.api.views.ActionPatch;
 import pl.polsl.task.manager.rest.api.views.RequestPatch;
 import pl.polsl.task.manager.rest.api.views.RequestPost;
@@ -20,13 +19,11 @@ import java.util.List;
 public class RequestServiceImpl implements RequestService{
 
     private final RequestRepository requestRepository;
-    private final StatusRepository statusRepository;
     private final AuthenticationService authenticationService;
     private final ActionService actionService;
 
-    public RequestServiceImpl(RequestRepository requestRepository, StatusRepository statusRepository, AuthenticationService authenticationService, ActionService actionService) {
+    public RequestServiceImpl(RequestRepository requestRepository, AuthenticationService authenticationService, ActionService actionService) {
         this.requestRepository = requestRepository;
-        this.statusRepository = statusRepository;
         this.authenticationService = authenticationService;
         this.actionService = actionService;
     }
@@ -39,7 +36,7 @@ public class RequestServiceImpl implements RequestService{
         Request request = new Request();
         request.setManager((Manager) currentUser);
         request.setDescription(requestPost.getDescription());
-        request.setStatus(actionService.getInitialStatus());
+        request.setActionStatus(actionService.getInitialStatus());
         return requestRepository.save(request);
     }
 
@@ -51,7 +48,7 @@ public class RequestServiceImpl implements RequestService{
             throw new BadRequestException("Cannot update progress in already finished request");
         if (request.getManager() != manager)
             throw new ForbiddenAccessException("Only manager that created request can update its progress");
-        return requestRepository.save(actionService.getPatchAction(request, actionPatch));
+        return requestRepository.save(actionService.getPatchedAction(request, actionPatch));
     }
 
     @Override
@@ -76,14 +73,8 @@ public class RequestServiceImpl implements RequestService{
 
     @Override
     public RequestView serialize(Request request) {
-        RequestView requestView = new RequestView();
-        requestView.setId(request.getId());
+        RequestView requestView = actionService.serialize(request, new RequestView());
         requestView.setObjectId(request.getObject().getId());
-        requestView.setDescription(request.getDescription());
-        requestView.setStatusCode(request.getStatus().getCode());
-        requestView.setResult(request.getResult());
-        requestView.setRegisterDate(request.getRegisterDate());
-        requestView.setEndDate(request.getEndDate());
         return requestView;
     }
 

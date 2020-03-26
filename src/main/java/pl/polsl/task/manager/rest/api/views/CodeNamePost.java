@@ -8,7 +8,7 @@ import org.springframework.lang.NonNull;
 @Data
 @NoArgsConstructor
 @ToString
-public class ActivityTypeView {
+public class CodeNamePost {
 
     @NonNull
     private String code;
@@ -17,4 +17,3 @@ public class ActivityTypeView {
     private String name;
 
 }
-

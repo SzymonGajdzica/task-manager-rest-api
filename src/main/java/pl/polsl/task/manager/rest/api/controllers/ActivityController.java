@@ -14,9 +14,8 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CrossOrigin
 @RestController
-@RequestMapping(value = "/activities")
+@RequestMapping(value = "/activity")
 public class ActivityController {
 
     private final ActivityService activityService;

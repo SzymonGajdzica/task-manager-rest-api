@@ -10,9 +10,8 @@ import pl.polsl.task.manager.rest.api.views.UserRolePatch;
 import pl.polsl.task.manager.rest.api.views.UserView;
 import springfox.documentation.annotations.ApiIgnore;
 
-@CrossOrigin
 @RestController
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/user")
 public class UserController {
 
     private final UserService userService;
@@ -21,7 +20,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PatchMapping(value = "/updateRole/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/update_role/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserView updateRole(@ApiIgnore @RequestHeader(value = "Authorization") String token,
                                @PathVariable Long userId,
                                @RequestBody UserRolePatch userRolePatch) {

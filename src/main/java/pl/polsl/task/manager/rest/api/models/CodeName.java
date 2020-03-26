@@ -6,21 +6,19 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.NonNull;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
-@EqualsAndHashCode
 @MappedSuperclass
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Data
 @NoArgsConstructor
 @ToString
-public class BaseEntityWithId {
+public abstract class CodeName extends CodeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "name", nullable = false)
     @NonNull
-    private Long id;
+    private String name;
 
 }
+

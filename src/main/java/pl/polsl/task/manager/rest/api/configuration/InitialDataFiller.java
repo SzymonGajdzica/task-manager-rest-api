@@ -3,7 +3,7 @@ package pl.polsl.task.manager.rest.api.configuration;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
-import pl.polsl.task.manager.rest.api.models.Status;
+import pl.polsl.task.manager.rest.api.models.ActionStatus;
 import pl.polsl.task.manager.rest.api.repositories.StatusRepository;
 
 import java.util.Arrays;
@@ -23,31 +23,31 @@ public class InitialDataFiller implements ApplicationRunner {
         if (!statusRepository.findAll().isEmpty())
             return;
 
-        Status statusOpen = new Status();
-        statusOpen.setCode("OPN");
-        statusOpen.setName("Open");
+        ActionStatus actionStatusOpen = new ActionStatus();
+        actionStatusOpen.setCode("OPN");
+        actionStatusOpen.setName("Open");
 
-        Status statusProgress = new Status();
-        statusProgress.setCode("PRO");
-        statusProgress.setName("Progress");
+        ActionStatus actionStatusProgress = new ActionStatus();
+        actionStatusProgress.setCode("PRO");
+        actionStatusProgress.setName("Progress");
 
-        Status statusCancelled = new Status();
-        statusCancelled.setCode("CAN");
-        statusCancelled.setName("Canceled");
+        ActionStatus actionStatusCancelled = new ActionStatus();
+        actionStatusCancelled.setCode("CAN");
+        actionStatusCancelled.setName("Canceled");
 
-        Status statusFinished = new Status();
-        statusFinished.setCode("FIN");
-        statusFinished.setName("Finished");
+        ActionStatus actionStatusFinished = new ActionStatus();
+        actionStatusFinished.setCode("FIN");
+        actionStatusFinished.setName("Finished");
 
-        statusRepository.saveAll(Arrays.asList(statusFinished, statusCancelled, statusProgress, statusOpen));
+        statusRepository.saveAll(Arrays.asList(actionStatusFinished, actionStatusCancelled, actionStatusProgress, actionStatusOpen));
 
-        statusOpen.setChildStatuses(Arrays.asList(statusCancelled, statusFinished, statusProgress));
-        statusProgress.setChildStatuses(Arrays.asList(statusCancelled, statusFinished));
-        statusProgress.setParentStatuses(Collections.singletonList(statusOpen));
-        statusCancelled.setParentStatuses(Arrays.asList(statusOpen, statusProgress));
-        statusFinished.setParentStatuses(Arrays.asList(statusOpen, statusProgress));
+        actionStatusOpen.setChildActionStatuses(Arrays.asList(actionStatusCancelled, actionStatusFinished, actionStatusProgress));
+        actionStatusProgress.setChildActionStatuses(Arrays.asList(actionStatusCancelled, actionStatusFinished));
+        actionStatusProgress.setParentActionStatuses(Collections.singletonList(actionStatusOpen));
+        actionStatusCancelled.setParentActionStatuses(Arrays.asList(actionStatusOpen, actionStatusProgress));
+        actionStatusFinished.setParentActionStatuses(Arrays.asList(actionStatusOpen, actionStatusProgress));
 
-        statusRepository.saveAll(Arrays.asList(statusFinished, statusCancelled, statusProgress, statusOpen));
+        statusRepository.saveAll(Arrays.asList(actionStatusFinished, actionStatusCancelled, actionStatusProgress, actionStatusOpen));
     }
 
 }

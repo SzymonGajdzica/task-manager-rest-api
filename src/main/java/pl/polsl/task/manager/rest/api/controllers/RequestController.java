@@ -14,9 +14,8 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CrossOrigin
 @RestController
-@RequestMapping(value = "/requests")
+@RequestMapping(value = "/request")
 public class RequestController {
 
     private final RequestService requestService;

@@ -11,9 +11,8 @@ import pl.polsl.task.manager.rest.api.views.AuthenticationView;
 import pl.polsl.task.manager.rest.api.views.UserPost;
 import pl.polsl.task.manager.rest.api.views.UserView;
 
-@CrossOrigin
 @RestController
-@RequestMapping(value = "/authenticate")
+@RequestMapping(value = "/authentication")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;

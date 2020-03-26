@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.NonNull;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
@@ -14,10 +16,11 @@ import javax.persistence.MappedSuperclass;
 @Data
 @NoArgsConstructor
 @ToString
-public class BaseEntityWithCode {
+public class IdEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @NonNull
-    private String code;
+    private Long id;
 
 }

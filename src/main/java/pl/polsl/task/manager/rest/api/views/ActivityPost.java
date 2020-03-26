@@ -2,19 +2,17 @@ package pl.polsl.task.manager.rest.api.views;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @ToString
-public class ActivityPost {
-
-    @ApiModelProperty(example = "Fix integer types")
-    @Nullable
-    private String description;
+public class ActivityPost extends ActionPost {
 
     @ApiModelProperty(required = true, position = 1)
     @NonNull

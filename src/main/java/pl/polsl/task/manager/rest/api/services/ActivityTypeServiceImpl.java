@@ -5,9 +5,9 @@ import pl.polsl.task.manager.rest.api.exceptions.CodeAlreadyUsedException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
 import pl.polsl.task.manager.rest.api.models.*;
 import pl.polsl.task.manager.rest.api.repositories.ActivityTypeRepository;
-import pl.polsl.task.manager.rest.api.views.ActivityTypePatch;
-import pl.polsl.task.manager.rest.api.views.ActivityTypePost;
-import pl.polsl.task.manager.rest.api.views.ActivityTypeView;
+import pl.polsl.task.manager.rest.api.views.CodeNamePatch;
+import pl.polsl.task.manager.rest.api.views.CodeNamePost;
+import pl.polsl.task.manager.rest.api.views.CodeNameView;
 
 import java.util.List;
 
@@ -16,49 +16,41 @@ public class ActivityTypeServiceImpl implements ActivityTypeService {
 
     private final ActivityTypeRepository activityTypeRepository;
     private final AuthenticationService authenticationService;
+    private final CodeNameService codeNameService;
 
-    public ActivityTypeServiceImpl(ActivityTypeRepository activityTypeRepository, AuthenticationService authenticationService) {
+    public ActivityTypeServiceImpl(ActivityTypeRepository activityTypeRepository, AuthenticationService authenticationService, CodeNameService codeNameService) {
         this.activityTypeRepository = activityTypeRepository;
         this.authenticationService = authenticationService;
+        this.codeNameService = codeNameService;
     }
 
     @Override
-    public ActivityType createActivityType(String token, ActivityTypePost activityTypePost) {
-        User currentUser = authenticationService.getUserFromToken(token);
-        if(!(currentUser instanceof Admin || currentUser instanceof Manager))
-            throw new ForbiddenAccessException(Manager.class, Admin.class);
-        if(activityTypeRepository.existsById(activityTypePost.getCode()))
-            throw new CodeAlreadyUsedException(activityTypePost.getCode());
-        ActivityType activityType = new ActivityType();
-        activityType.setCode(activityTypePost.getCode());
-        activityType.setName(activityTypePost.getName());
+    public ActivityType createActivityType(String token, CodeNamePost codeNamePost) {
+        codeNameService.validateIfUserCanModify(token);
+        if (activityTypeRepository.existsById(codeNamePost.getCode()))
+            throw new CodeAlreadyUsedException(codeNamePost.getCode());
+        ActivityType activityType = codeNameService.getPatchedCodeName(new ActivityType(), codeNamePost);
         return activityTypeRepository.save(activityType);
     }
 
     @Override
-    public ActivityType getPatchedActivity(String token, String activityTypeCode, ActivityTypePatch activityTypePatch) {
-        User currentUser = authenticationService.getUserFromToken(token);
-        if(!(currentUser instanceof Admin || currentUser instanceof Manager))
-            throw new ForbiddenAccessException(Manager.class, Admin.class);
+    public ActivityType getPatchedActivityType(String token, String activityTypeCode, CodeNamePatch codeNamePatch) {
+        codeNameService.validateIfUserCanModify(token);
         ActivityType activityType = activityTypeRepository.getById(activityTypeCode);
-        if(activityTypePatch.getName() != null)
-            activityType.setName(activityTypePatch.getName());
-        return activityTypeRepository.save(activityType);
+        return activityTypeRepository.save(codeNameService.getPatchedCodeName(activityType, codeNamePatch));
     }
 
     @Override
-    public List<ActivityType> getAllActivityTypes(String token) {
+    public List<ActivityType> getActivitiesTypes(String token) {
         User currentUser = authenticationService.getUserFromToken(token);
-        if(!(currentUser instanceof Admin || currentUser instanceof Manager || currentUser instanceof Worker))
+        if (!(currentUser instanceof Admin || currentUser instanceof Manager || currentUser instanceof Worker))
             throw new ForbiddenAccessException(Manager.class, Admin.class, Worker.class);
         return activityTypeRepository.findAll();
     }
 
     @Override
-    public ActivityTypeView serialize(ActivityType activityType) {
-        ActivityTypeView activityTypeView = new ActivityTypeView();
-        activityTypeView.setCode(activityType.getCode());
-        activityTypeView.setName(activityType.getName());
-        return activityTypeView;
+    public CodeNameView serialize(ActivityType activityType) {
+        return codeNameService.serialize(activityType);
     }
+
 }

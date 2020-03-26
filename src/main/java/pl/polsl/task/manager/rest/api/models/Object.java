@@ -16,7 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ToString
-public class Object extends BaseEntityWithId {
+public class Object extends IdEntity {
 
     @Column(name = "name", nullable = false)
     @NonNull

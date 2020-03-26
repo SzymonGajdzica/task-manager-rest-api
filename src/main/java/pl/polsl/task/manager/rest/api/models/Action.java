@@ -18,7 +18,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @ToString
-public class Action extends BaseEntityWithId {
+public abstract class Action extends IdEntity {
 
     @Column(name = "description")
     @Nullable
@@ -26,7 +26,7 @@ public class Action extends BaseEntityWithId {
 
     @ManyToOne
     @NonNull
-    private Status status;
+    private ActionStatus actionStatus;
 
     @Column(name = "result")
     @Nullable

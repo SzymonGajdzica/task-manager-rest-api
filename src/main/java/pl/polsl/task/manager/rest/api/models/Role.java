@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ToString
-public class Role extends BaseEntityWithCode {
+public class Role extends CodeEntity {
 
     @Column(name = "name", nullable = false)
     @NonNull

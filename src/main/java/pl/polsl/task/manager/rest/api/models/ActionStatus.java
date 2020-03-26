@@ -19,7 +19,7 @@ import java.util.List;
 @ToString
 @Entity
 @Table(name = "action_statuses")
-public class Status extends BaseEntityWithCode {
+public class ActionStatus extends CodeEntity {
 
     @Column(name = "name", nullable = false)
     @NonNull
@@ -27,10 +27,10 @@ public class Status extends BaseEntityWithCode {
 
     @ManyToMany
     @NonNull
-    private List<Status> childStatuses = new LinkedList<>();
+    private List<ActionStatus> childActionStatuses = new LinkedList<>();
 
     @ManyToMany
     @NonNull
-    private List<Status> parentStatuses = new LinkedList<>();
+    private List<ActionStatus> parentActionStatuses = new LinkedList<>();
 
 }

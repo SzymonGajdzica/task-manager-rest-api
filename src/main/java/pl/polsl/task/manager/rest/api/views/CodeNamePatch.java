@@ -8,7 +8,7 @@ import org.springframework.lang.Nullable;
 @Data
 @NoArgsConstructor
 @ToString
-public class ActivityTypePatch {
+public class CodeNamePatch {
 
     @Nullable
     private String name;
