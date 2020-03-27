@@ -32,7 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] AUTH_WHITELIST = {
             // app whitelist
-            "/authenticate/**",
+            "/authentication/**",
             // -- swagger ui
             "/v2/api-docs",
             "/swagger-resources",

@@ -11,6 +11,8 @@ import pl.polsl.task.manager.rest.api.views.UserPatch;
 import pl.polsl.task.manager.rest.api.views.UserRolePatch;
 import pl.polsl.task.manager.rest.api.views.UserView;
 
+import java.util.List;
+
 @Component
 public class UserServiceImpl implements UserService {
 
@@ -81,6 +83,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
     public UserView serialize(User user) {
         UserView userView = new UserView();
         userView.setId(user.getId());
@@ -88,7 +95,7 @@ public class UserServiceImpl implements UserService {
         userView.setEmail(user.getEmail());
         userView.setSurname(user.getSurname());
         userView.setUsername(user.getUsername());
-        if(user.getRole() != null)
+        if (user.getRole() != null)
             userView.setRoleCode(user.getRole().getCode());
         return userView;
     }

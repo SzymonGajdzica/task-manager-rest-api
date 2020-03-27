@@ -6,6 +6,8 @@ import pl.polsl.task.manager.rest.api.views.UserPatch;
 import pl.polsl.task.manager.rest.api.views.UserRolePatch;
 import pl.polsl.task.manager.rest.api.views.UserView;
 
+import java.util.List;
+
 public interface UserService {
 
     @NonNull
@@ -18,6 +20,9 @@ public interface UserService {
     User getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch);
 
     void deleteUser(String token);
+
+    @NonNull
+    List<User> getUsers();
 
     @NonNull
     UserView serialize(User user);

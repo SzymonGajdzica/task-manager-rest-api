@@ -88,7 +88,7 @@ public class ActivityServiceImpl implements ActivityService {
         User worker = authenticationService.getUserFromToken(token);
         if (!(worker instanceof Worker))
             throw new BadRequestException("This request is designed for workers");
-        return activityRepository.findAllByWorkerId(worker.getId());
+        return activityRepository.findAllByWorker((Worker) worker);
     }
 
     @Override

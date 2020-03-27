@@ -10,6 +10,9 @@ import pl.polsl.task.manager.rest.api.views.UserRolePatch;
 import pl.polsl.task.manager.rest.api.views.UserView;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping(value = "/user")
 public class UserController {
@@ -32,6 +35,12 @@ public class UserController {
     public UserView getUser(@ApiIgnore @RequestHeader(value = "Authorization") String token) {
         User user = userService.getUser(token);
         return userService.serialize(user);
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<UserView> getUsers() {
+        List<User> users = userService.getUsers();
+        return users.stream().map(userService::serialize).collect(Collectors.toList());
     }
 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)

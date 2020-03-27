@@ -4,19 +4,15 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 @Data
 @NoArgsConstructor
 @ToString
-public class CodeNamePost {
+public class ObjectPatch {
 
-    @ApiModelProperty(example = "PRG")
-    @NonNull
-    private String code;
-
-    @ApiModelProperty(example = "Programming", position = 1)
-    @NonNull
+    @ApiModelProperty(required = true, example = "IOS", position = 1)
+    @Nullable
     private String name;
 
 }

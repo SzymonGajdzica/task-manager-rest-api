@@ -82,7 +82,7 @@ public class RequestServiceImpl implements RequestService{
     public List<Request> getAllRequests(String token) {
         User currentUser = authenticationService.getUserFromToken(token);
         if (currentUser instanceof Manager)
-            return requestRepository.findAllByManagerId(currentUser.getId());
+            return requestRepository.findAllByManager((Manager) currentUser);
         if (currentUser instanceof Admin)
             return requestRepository.findAll();
         throw new ForbiddenAccessException(Manager.class, Admin.class);
