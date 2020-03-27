@@ -19,7 +19,7 @@ public interface UserService {
     @NonNull
     User getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch);
 
-    void deleteUser(String token);
+    void deleteUser(String token, Long userId);
 
     @NonNull
     List<User> getUsers();

@@ -23,9 +23,13 @@ public interface RequestService {
     void deleteRequest(String token, Long requestId);
 
     @NonNull
-    RequestView serialize(Request request);
+    List<Request> getRequests(String token);
 
     @NonNull
-    List<Request> getAllRequests(String token);
+    Request getRequest(String token, Long requestId);
+
+    @NonNull
+    RequestView serialize(Request request);
+
 
 }

@@ -31,9 +31,16 @@ public class RequestController {
         return requestService.serialize(request);
     }
 
+    @GetMapping(value = "/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<RequestView> getRequests(@ApiIgnore @RequestHeader(value = "Authorization") String token,
+                                         @PathVariable Long requestId) {
+        List<Request> requests = requestService.getRequests(token);
+        return requests.stream().map(requestService::serialize).collect(Collectors.toList());
+    }
+
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RequestView> getRequests(@ApiIgnore @RequestHeader(value = "Authorization") String token) {
-        List<Request> requests = requestService.getAllRequests(token);
+        List<Request> requests = requestService.getRequests(token);
         return requests.stream().map(requestService::serialize).collect(Collectors.toList());
     }
 

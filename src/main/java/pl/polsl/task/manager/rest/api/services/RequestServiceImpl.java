@@ -3,10 +3,7 @@ package pl.polsl.task.manager.rest.api.services;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.BadRequestException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
-import pl.polsl.task.manager.rest.api.models.Admin;
-import pl.polsl.task.manager.rest.api.models.Manager;
-import pl.polsl.task.manager.rest.api.models.Request;
-import pl.polsl.task.manager.rest.api.models.User;
+import pl.polsl.task.manager.rest.api.models.*;
 import pl.polsl.task.manager.rest.api.repositories.RequestRepository;
 import pl.polsl.task.manager.rest.api.views.ActionPatch;
 import pl.polsl.task.manager.rest.api.views.RequestPatch;
@@ -79,13 +76,29 @@ public class RequestServiceImpl implements RequestService{
     }
 
     @Override
-    public List<Request> getAllRequests(String token) {
+    public Request getRequest(String token, Long requestId) {
+        User user = authenticationService.getUserFromToken(token);
+        Request request = requestRepository.getById(requestId);
+        if (user instanceof Admin || user instanceof Manager)
+            return request;
+        if (user instanceof Client)
+            if (request.getObject().getClient() == user)
+                return request;
+            else
+                throw new ForbiddenAccessException("Only client that is assign to this request can browse it");
+        throw new ForbiddenAccessException(Manager.class, Admin.class, Client.class);
+    }
+
+    @Override
+    public List<Request> getRequests(String token) {
         User currentUser = authenticationService.getUserFromToken(token);
         if (currentUser instanceof Manager)
             return requestRepository.findAllByManager((Manager) currentUser);
+        if (currentUser instanceof Client)
+            return requestRepository.findAllByObject_Client((Client) currentUser);
         if (currentUser instanceof Admin)
             return requestRepository.findAll();
-        throw new ForbiddenAccessException(Manager.class, Admin.class);
+        throw new ForbiddenAccessException(Manager.class, Admin.class, Client.class);
     }
 
 }

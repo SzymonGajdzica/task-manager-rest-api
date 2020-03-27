@@ -77,9 +77,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(String token) {
+    public void deleteUser(String token, Long userId) {
         User currentUser = getUser(token);
-        userRepository.delete(currentUser);
+        if (!(currentUser instanceof Admin))
+            throw new ForbiddenAccessException(Admin.class);
+        userRepository.delete(userRepository.getById(userId));
     }
 
     @Override
