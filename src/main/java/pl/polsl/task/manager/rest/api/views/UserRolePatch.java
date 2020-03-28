@@ -13,6 +13,6 @@ public class UserRolePatch {
 
     @ApiModelProperty(example = "MAN")
     @Nullable
-    private  String roleCode;
+    private String roleCode;
 
 }

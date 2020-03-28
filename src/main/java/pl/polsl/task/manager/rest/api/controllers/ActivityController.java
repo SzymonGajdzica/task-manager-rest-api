@@ -50,8 +50,8 @@ public class ActivityController {
 
     @GetMapping(value = "/request", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ActivityView> getRequestActivities(@ApiIgnore @RequestHeader(value = "Authorization") String token,
-                                                   @RequestParam Long activityId) {
-        List<Activity> activities = activityService.getRequestActivities(token, activityId);
+                                                   @RequestParam Long requestId) {
+        List<Activity> activities = activityService.getRequestActivities(token, requestId);
         return activities.stream().map(activityService::serialize).collect(Collectors.toList());
     }
 

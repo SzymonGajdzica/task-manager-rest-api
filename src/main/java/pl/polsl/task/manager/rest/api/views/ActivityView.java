@@ -20,7 +20,7 @@ public class ActivityView extends ActionView {
 
     @ApiModelProperty(example = "REF", position = 7)
     @Nullable
-    private String activityCode;
+    private String activityTypeCode;
 
     @ApiModelProperty(position = 8)
     @Nullable

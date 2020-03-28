@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 @Data
 @NoArgsConstructor
@@ -31,8 +32,8 @@ public class UserView {
     @NonNull
     private String username;
 
-    @ApiModelProperty(required = true, example = "John33", position = 4)
-    @NonNull
+    @ApiModelProperty(example = "ADM", position = 5)
+    @Nullable
     private String roleCode;
 
 }

@@ -26,7 +26,7 @@ public interface RequestService {
     List<Request> getRequests(String token);
 
     @NonNull
-    Request getRequest(String token, Long requestId);
+    List<Request> getRequests(String token, Long objectId);
 
     @NonNull
     RequestView serialize(Request request);

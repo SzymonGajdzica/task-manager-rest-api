@@ -16,7 +16,7 @@ import javax.persistence.MappedSuperclass;
 @Data
 @NoArgsConstructor
 @ToString
-public class IdEntity {
+public abstract class IdEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

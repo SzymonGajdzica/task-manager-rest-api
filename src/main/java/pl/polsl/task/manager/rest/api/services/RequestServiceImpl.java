@@ -3,7 +3,9 @@ package pl.polsl.task.manager.rest.api.services;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.BadRequestException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
+import pl.polsl.task.manager.rest.api.models.Object;
 import pl.polsl.task.manager.rest.api.models.*;
+import pl.polsl.task.manager.rest.api.repositories.ObjectRepository;
 import pl.polsl.task.manager.rest.api.repositories.RequestRepository;
 import pl.polsl.task.manager.rest.api.views.ActionPatch;
 import pl.polsl.task.manager.rest.api.views.RequestPatch;
@@ -17,11 +19,13 @@ public class RequestServiceImpl implements RequestService{
 
     private final RequestRepository requestRepository;
     private final AuthenticationService authenticationService;
+    private final ObjectRepository objectRepository;
     private final ActionService actionService;
 
-    public RequestServiceImpl(RequestRepository requestRepository, AuthenticationService authenticationService, ActionService actionService) {
+    public RequestServiceImpl(RequestRepository requestRepository, AuthenticationService authenticationService, ObjectRepository objectRepository, ActionService actionService) {
         this.requestRepository = requestRepository;
         this.authenticationService = authenticationService;
+        this.objectRepository = objectRepository;
         this.actionService = actionService;
     }
 
@@ -39,20 +43,20 @@ public class RequestServiceImpl implements RequestService{
 
     @Override
     public Request getPatchedRequest(String token, Long requestId, ActionPatch actionPatch) {
-        User manager = authenticationService.getUserFromToken(token);
+        User currentUser = authenticationService.getUserFromToken(token);
         Request request = requestRepository.getById(requestId);
-        if (request.getResult() != null)
+        if (request.getEndDate() != null)
             throw new BadRequestException("Cannot update progress in already finished request");
-        if (request.getManager() != manager)
+        if (!currentUser.equals(request.getManager()))
             throw new ForbiddenAccessException("Only manager that created request can update its progress");
         return requestRepository.save(actionService.getPatchedAction(request, actionPatch));
     }
 
     @Override
     public Request getPatchedRequest(String token, Long requestId, RequestPatch requestPatch) {
-        User manager = authenticationService.getUserFromToken(token);
+        User currentUser = authenticationService.getUserFromToken(token);
         Request request = requestRepository.getById(requestId);
-        if (request.getManager() != manager)
+        if (!currentUser.equals(request.getManager()))
             throw new ForbiddenAccessException("Only manager that created request can update it");
         if (requestPatch.getDescription() != null)
             request.setDescription(requestPatch.getDescription());
@@ -61,9 +65,9 @@ public class RequestServiceImpl implements RequestService{
 
     @Override
     public void deleteRequest(String token, Long requestId) {
-        User manager = authenticationService.getUserFromToken(token);
+        User currentUser = authenticationService.getUserFromToken(token);
         Request request = requestRepository.getById(requestId);
-        if (request.getManager() != manager)
+        if (!currentUser.equals(request.getManager()))
             throw new ForbiddenAccessException("Only manager that created request can remove it");
         requestRepository.delete(request);
     }
@@ -76,29 +80,31 @@ public class RequestServiceImpl implements RequestService{
     }
 
     @Override
-    public Request getRequest(String token, Long requestId) {
-        User user = authenticationService.getUserFromToken(token);
-        Request request = requestRepository.getById(requestId);
-        if (user instanceof Admin || user instanceof Manager)
-            return request;
-        if (user instanceof Client)
-            if (request.getObject().getClient() == user)
-                return request;
-            else
-                throw new ForbiddenAccessException("Only client that is assign to this request can browse it");
-        throw new ForbiddenAccessException(Manager.class, Admin.class, Client.class);
+    public List<Request> getRequests(String token, Long objectId) {
+        User currentUser = authenticationService.getUserFromToken(token);
+        Object object = objectRepository.getById(objectId);
+        if (currentUser instanceof Manager)
+            return requestRepository.findAllByManagerAndObject((Manager) currentUser, object);
+        if (currentUser instanceof Client) {
+            if (!object.getClient().equals(currentUser))
+                throw new ForbiddenAccessException("Client can browse only objects assigned to his account");
+            return object.getRequests();
+        }
+        if (currentUser instanceof Worker)
+            return requestRepository.findAllByActivitiesContainsAndObject(((Worker) currentUser).getActivities(), object);
+        throw new ForbiddenAccessException(Manager.class, Worker.class, Client.class);
     }
 
     @Override
     public List<Request> getRequests(String token) {
         User currentUser = authenticationService.getUserFromToken(token);
-        if (currentUser instanceof Manager)
-            return requestRepository.findAllByManager((Manager) currentUser);
         if (currentUser instanceof Client)
-            return requestRepository.findAllByObject_Client((Client) currentUser);
-        if (currentUser instanceof Admin)
-            return requestRepository.findAll();
-        throw new ForbiddenAccessException(Manager.class, Admin.class, Client.class);
+            return requestRepository.findAllByObjectClient((Client) currentUser);
+        if (currentUser instanceof Manager)
+            return ((Manager) currentUser).getRequests();
+        if (currentUser instanceof Worker)
+            return requestRepository.findAllByActivitiesContains(((Worker) currentUser).getActivities());
+        throw new ForbiddenAccessException(Manager.class, Worker.class, Client.class);
     }
 
 }

@@ -20,7 +20,7 @@ public class ForbiddenAccessException extends RuntimeException {
                 .stream(users)
                 .map(Class::getSimpleName)
                 .collect(Collectors.toList());
-        return "This resource is available only for: " + String.join(" , ", classNames);
+        return "This resource or request is available only for: " + String.join(" , ", classNames);
     }
 
 }

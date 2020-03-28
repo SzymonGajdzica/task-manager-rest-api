@@ -33,16 +33,14 @@ public class RequestController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<RequestView> getRequests(@ApiIgnore @RequestHeader(value = "Authorization") String token) {
-        List<Request> requests = requestService.getRequests(token);
+    public List<RequestView> getRequests(@ApiIgnore @RequestHeader(value = "Authorization") String token,
+                                         @RequestParam(required = false) Long objectId) {
+        List<Request> requests;
+        if (objectId != null)
+            requests = requestService.getRequests(token, objectId);
+        else
+            requests = requestService.getRequests(token);
         return requests.stream().map(requestService::serialize).collect(Collectors.toList());
-    }
-
-    @GetMapping(value = "/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public RequestView getRequest(@ApiIgnore @RequestHeader(value = "Authorization") String token,
-                                  @PathVariable Long requestId) {
-        Request request = requestService.getRequest(token, requestId);
-        return requestService.serialize(request);
     }
 
     @PatchMapping(value = "/progress/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

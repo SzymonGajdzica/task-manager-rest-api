@@ -3,7 +3,10 @@ package pl.polsl.task.manager.rest.api.services;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.CodeAlreadyUsedException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
-import pl.polsl.task.manager.rest.api.models.*;
+import pl.polsl.task.manager.rest.api.models.ActivityType;
+import pl.polsl.task.manager.rest.api.models.Manager;
+import pl.polsl.task.manager.rest.api.models.User;
+import pl.polsl.task.manager.rest.api.models.Worker;
 import pl.polsl.task.manager.rest.api.repositories.ActivityTypeRepository;
 import pl.polsl.task.manager.rest.api.views.CodeNamePatch;
 import pl.polsl.task.manager.rest.api.views.CodeNamePost;
@@ -43,8 +46,8 @@ public class ActivityTypeServiceImpl implements ActivityTypeService {
     @Override
     public List<ActivityType> getActivitiesTypes(String token) {
         User currentUser = authenticationService.getUserFromToken(token);
-        if (!(currentUser instanceof Admin || currentUser instanceof Manager || currentUser instanceof Worker))
-            throw new ForbiddenAccessException(Manager.class, Admin.class, Worker.class);
+        if (!(currentUser instanceof Manager || currentUser instanceof Worker))
+            throw new ForbiddenAccessException(Manager.class, Worker.class);
         return activityTypeRepository.findAll();
     }
 

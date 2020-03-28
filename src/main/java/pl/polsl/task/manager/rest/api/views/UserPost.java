@@ -15,19 +15,19 @@ public class UserPost {
     @NonNull
     private String name;
 
-    @ApiModelProperty(required = true, example = "Bosh")
+    @ApiModelProperty(required = true, example = "Bosh", position = 1)
     @NonNull
     private String surname;
 
-    @ApiModelProperty(required = true, example = "JohnBosh33@gmail.com")
+    @ApiModelProperty(required = true, example = "JohnBosh33@gmail.com", position = 2)
     @NonNull
     private String email;
 
-    @ApiModelProperty(required = true, example = "admin")
+    @ApiModelProperty(required = true, example = "admin", position = 3)
     @NonNull
     private String username;
 
-    @ApiModelProperty(required = true, example = "admin")
+    @ApiModelProperty(required = true, example = "admin", position = 4)
     @NonNull
     private String password;
 

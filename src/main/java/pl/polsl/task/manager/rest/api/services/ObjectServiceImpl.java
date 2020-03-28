@@ -3,8 +3,10 @@ package pl.polsl.task.manager.rest.api.services;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.BadRequestException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
+import pl.polsl.task.manager.rest.api.models.Client;
+import pl.polsl.task.manager.rest.api.models.Manager;
 import pl.polsl.task.manager.rest.api.models.Object;
-import pl.polsl.task.manager.rest.api.models.*;
+import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.repositories.ObjectRepository;
 import pl.polsl.task.manager.rest.api.repositories.ObjectTypeRepository;
 import pl.polsl.task.manager.rest.api.repositories.UserRepository;
@@ -55,10 +57,10 @@ public class ObjectServiceImpl implements ObjectService {
     public List<Object> getObjects(String token) {
         User user = authenticationService.getUserFromToken(token);
         if (user instanceof Client)
-            return objectRepository.getAllByClient((Client) user);
-        if (user instanceof Manager || user instanceof Admin)
+            return ((Client) user).getObjects();
+        if (user instanceof Manager)
             return objectRepository.findAll();
-        throw new ForbiddenAccessException(Manager.class, Admin.class, Client.class);
+        throw new ForbiddenAccessException(Manager.class, Client.class);
     }
 
     @Override
@@ -69,8 +71,8 @@ public class ObjectServiceImpl implements ObjectService {
 
     private void checkModifyPermission(String token) {
         User user = authenticationService.getUserFromToken(token);
-        if (!(user instanceof Manager || user instanceof Admin))
-            throw new ForbiddenAccessException(Admin.class, Manager.class);
+        if (!(user instanceof Manager))
+            throw new ForbiddenAccessException(Manager.class);
     }
 
     @Override

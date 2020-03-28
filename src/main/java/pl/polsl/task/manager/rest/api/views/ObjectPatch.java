@@ -11,7 +11,7 @@ import org.springframework.lang.Nullable;
 @ToString
 public class ObjectPatch {
 
-    @ApiModelProperty(required = true, example = "IOS", position = 1)
+    @ApiModelProperty(example = "IOS")
     @Nullable
     private String name;
 

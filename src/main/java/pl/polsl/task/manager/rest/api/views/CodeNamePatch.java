@@ -11,7 +11,7 @@ import org.springframework.lang.Nullable;
 @ToString
 public class CodeNamePatch {
 
-    @ApiModelProperty(example = "Programming", position = 1)
+    @ApiModelProperty(example = "Programming")
     @Nullable
     private String name;
 

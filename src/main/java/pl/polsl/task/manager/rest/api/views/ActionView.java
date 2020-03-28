@@ -19,7 +19,7 @@ public abstract class ActionView {
     @NonNull
     private Long id;
 
-    @ApiModelProperty(required = true, example = "There is problem with...", position = 1)
+    @ApiModelProperty(example = "There is problem with...", position = 1)
     @Nullable
     private String description;
 
@@ -27,7 +27,7 @@ public abstract class ActionView {
     @NonNull
     private String statusCode;
 
-    @ApiModelProperty(required = true, example = "Done!", position = 3)
+    @ApiModelProperty(example = "Done!", position = 3)
     @Nullable
     private String result;
 
@@ -36,7 +36,7 @@ public abstract class ActionView {
     @NonNull
     private Date registerDate;
 
-    @ApiModelProperty(required = true, position = 5)
+    @ApiModelProperty(position = 5)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Nullable
     private Date endDate;

@@ -3,7 +3,10 @@ package pl.polsl.task.manager.rest.api.services;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.CodeAlreadyUsedException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
-import pl.polsl.task.manager.rest.api.models.*;
+import pl.polsl.task.manager.rest.api.models.Client;
+import pl.polsl.task.manager.rest.api.models.Manager;
+import pl.polsl.task.manager.rest.api.models.ObjectType;
+import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.repositories.ObjectTypeRepository;
 import pl.polsl.task.manager.rest.api.views.CodeNamePatch;
 import pl.polsl.task.manager.rest.api.views.CodeNamePost;
@@ -43,8 +46,8 @@ public class ObjectTypeServiceImpl implements ObjectTypeService {
     @Override
     public List<ObjectType> getObjectsTypes(String token) {
         User currentUser = authenticationService.getUserFromToken(token);
-        if (!(currentUser instanceof Admin || currentUser instanceof Manager || currentUser instanceof Client))
-            throw new ForbiddenAccessException(Manager.class, Admin.class, Client.class);
+        if (!(currentUser instanceof Manager || currentUser instanceof Client))
+            throw new ForbiddenAccessException(Manager.class, Client.class);
         return objectTypeRepository.findAll();
     }
 

@@ -38,6 +38,7 @@ public abstract class Action extends IdEntity {
     private Date registerDate = new Date();
 
     @Column(name = "end_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Nullable
     private Date endDate = null;
 

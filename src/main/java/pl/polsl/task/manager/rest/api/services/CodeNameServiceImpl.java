@@ -2,7 +2,6 @@ package pl.polsl.task.manager.rest.api.services;
 
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
-import pl.polsl.task.manager.rest.api.models.Admin;
 import pl.polsl.task.manager.rest.api.models.CodeName;
 import pl.polsl.task.manager.rest.api.models.Manager;
 import pl.polsl.task.manager.rest.api.models.User;
@@ -22,8 +21,8 @@ public class CodeNameServiceImpl implements CodeNameService {
     @Override
     public void validateIfUserCanModify(String token) {
         User user = authenticationService.getUserFromToken(token);
-        if (!(user instanceof Admin || user instanceof Manager))
-            throw new ForbiddenAccessException(Manager.class, Admin.class);
+        if (!(user instanceof Manager))
+            throw new ForbiddenAccessException(Manager.class);
     }
 
     @Override
