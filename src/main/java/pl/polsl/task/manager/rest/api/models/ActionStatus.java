@@ -25,7 +25,7 @@ public class ActionStatus extends CodeEntity {
     @NonNull
     private String name;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "parentActionStatuses")
     @NonNull
     private List<ActionStatus> childActionStatuses = new LinkedList<>();
 

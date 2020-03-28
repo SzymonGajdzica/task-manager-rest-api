@@ -1,5 +1,6 @@
 package pl.polsl.task.manager.rest.api.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import pl.polsl.task.manager.rest.api.models.ActivityType;
@@ -22,6 +23,7 @@ public class ActivityTypeController {
         this.activityTypeService = activityTypeService;
     }
 
+    @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CodeNameView createActivityType(@ApiIgnore @RequestHeader(value = "Authorization") String token,
                                            @RequestBody CodeNamePost codeNamePost) {

@@ -24,6 +24,7 @@ public class ActivityController {
         this.activityService = activityService;
     }
 
+    @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ActivityView createActivity(@ApiIgnore @RequestHeader(value = "Authorization") String token,
                                        @RequestBody ActivityPost activityPost) {

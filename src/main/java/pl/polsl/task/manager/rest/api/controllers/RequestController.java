@@ -24,6 +24,7 @@ public class RequestController {
         this.requestService = requestService;
     }
 
+    @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public RequestView createRequest(@ApiIgnore @RequestHeader(value = "Authorization") String token,
                                      @RequestBody RequestPost requestPost) {
@@ -31,17 +32,17 @@ public class RequestController {
         return requestService.serialize(request);
     }
 
-    @GetMapping(value = "/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<RequestView> getRequests(@ApiIgnore @RequestHeader(value = "Authorization") String token,
-                                         @PathVariable Long requestId) {
-        List<Request> requests = requestService.getRequests(token);
-        return requests.stream().map(requestService::serialize).collect(Collectors.toList());
-    }
-
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RequestView> getRequests(@ApiIgnore @RequestHeader(value = "Authorization") String token) {
         List<Request> requests = requestService.getRequests(token);
         return requests.stream().map(requestService::serialize).collect(Collectors.toList());
+    }
+
+    @GetMapping(value = "/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public RequestView getRequest(@ApiIgnore @RequestHeader(value = "Authorization") String token,
+                                  @PathVariable Long requestId) {
+        Request request = requestService.getRequest(token, requestId);
+        return requestService.serialize(request);
     }
 
     @PatchMapping(value = "/progress/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

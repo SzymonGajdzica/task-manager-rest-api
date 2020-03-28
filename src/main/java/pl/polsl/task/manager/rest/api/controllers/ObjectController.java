@@ -23,6 +23,7 @@ public class ObjectController {
         this.objectService = objectService;
     }
 
+    @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ObjectView createObject(@ApiIgnore @RequestHeader(value = "Authorization") String token,
                                    @RequestBody ObjectPost objectPost) {

@@ -32,7 +32,7 @@ public class ActionStatusServiceImpl implements ActionStatusService {
                 .stream()
                 .map(CodeEntity::getCode)
                 .collect(Collectors.toList());
-        actionStatusView.setChildrenCode(childrenCode);
+        actionStatusView.setChildrenCodes(childrenCode);
         return actionStatusView;
     }
 }

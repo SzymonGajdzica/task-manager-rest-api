@@ -23,6 +23,6 @@ public class ActionStatusView {
 
     @ApiModelProperty(required = true, position = 2)
     @NonNull
-    private List<String> childrenCode;
+    private List<String> childrenCodes;
 
 }
