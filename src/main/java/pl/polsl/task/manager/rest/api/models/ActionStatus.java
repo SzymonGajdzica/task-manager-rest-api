@@ -25,7 +25,7 @@ public class ActionStatus extends CodeEntity {
     @NonNull
     private String name;
 
-    @ManyToMany(mappedBy = "parentActionStatuses")
+    @ManyToMany
     @NonNull
     private Set<ActionStatus> childActionStatuses = new HashSet<>();
 
