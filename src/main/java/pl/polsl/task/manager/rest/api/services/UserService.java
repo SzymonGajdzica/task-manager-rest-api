@@ -24,6 +24,8 @@ public interface UserService {
     @NonNull
     List<User> getUsers();
 
+    void createInitialData() throws Exception;
+
     @NonNull
     UserView serialize(User user);
 

@@ -11,7 +11,10 @@ public interface ActionStatusService {
     @NonNull
     List<ActionStatus> getAvailableStatuses();
 
+    void createInitialData() throws Exception;
+
     @NonNull
     ActionStatusView serialize(ActionStatus actionStatus);
+
 
 }

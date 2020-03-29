@@ -1,6 +1,7 @@
 package pl.polsl.task.manager.rest.api.services;
 
 import org.springframework.lang.Nullable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
 import pl.polsl.task.manager.rest.api.exceptions.NotImplementedException;
@@ -19,11 +20,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
     private final RoleRepository roleRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, AuthenticationService authenticationService, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationService authenticationService, RoleRepository roleRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.authenticationService = authenticationService;
         this.roleRepository = roleRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
@@ -87,6 +90,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public void createInitialData() throws Exception {
+        Admin admin = new Admin();
+        admin.setEmail("primaryAdmin@wp.pl");
+        admin.setName("Primary");
+        admin.setSurname("Admin");
+        admin.setUsername("admin1");
+        admin.setPassword(bCryptPasswordEncoder.encode("admin1"));
+        admin.setRole(roleRepository.getOne("ADM"));
+        userRepository.save(admin);
     }
 
     @Override
