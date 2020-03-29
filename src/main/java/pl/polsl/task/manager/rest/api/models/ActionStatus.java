@@ -10,8 +10,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Data
@@ -27,10 +27,10 @@ public class ActionStatus extends CodeEntity {
 
     @ManyToMany(mappedBy = "parentActionStatuses")
     @NonNull
-    private List<ActionStatus> childActionStatuses = new LinkedList<>();
+    private Set<ActionStatus> childActionStatuses = new HashSet<>();
 
     @ManyToMany
     @NonNull
-    private List<ActionStatus> parentActionStatuses = new LinkedList<>();
+    private Set<ActionStatus> parentActionStatuses = new HashSet<>();
 
 }

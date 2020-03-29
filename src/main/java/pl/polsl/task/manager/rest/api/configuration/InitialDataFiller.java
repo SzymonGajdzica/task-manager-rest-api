@@ -8,6 +8,7 @@ import pl.polsl.task.manager.rest.api.repositories.StatusRepository;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 
 @Configuration
 public class InitialDataFiller implements ApplicationRunner {
@@ -20,7 +21,7 @@ public class InitialDataFiller implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        if (!statusRepository.findAll().isEmpty())
+        if (statusRepository.count() != 0)
             return;
 
         ActionStatus actionStatusOpen = new ActionStatus();
@@ -41,11 +42,11 @@ public class InitialDataFiller implements ApplicationRunner {
 
         statusRepository.saveAll(Arrays.asList(actionStatusFinished, actionStatusCancelled, actionStatusProgress, actionStatusOpen));
 
-        actionStatusOpen.setChildActionStatuses(Arrays.asList(actionStatusCancelled, actionStatusFinished, actionStatusProgress));
-        actionStatusProgress.setChildActionStatuses(Arrays.asList(actionStatusCancelled, actionStatusFinished));
-        actionStatusProgress.setParentActionStatuses(Collections.singletonList(actionStatusOpen));
-        actionStatusCancelled.setParentActionStatuses(Arrays.asList(actionStatusOpen, actionStatusProgress));
-        actionStatusFinished.setParentActionStatuses(Arrays.asList(actionStatusOpen, actionStatusProgress));
+        actionStatusOpen.setChildActionStatuses(new HashSet<>(Arrays.asList(actionStatusCancelled, actionStatusFinished, actionStatusProgress)));
+        actionStatusProgress.setChildActionStatuses(new HashSet<>(Arrays.asList(actionStatusCancelled, actionStatusFinished)));
+        actionStatusProgress.setParentActionStatuses(new HashSet<>(Collections.singletonList(actionStatusOpen)));
+        actionStatusCancelled.setParentActionStatuses(new HashSet<>(Arrays.asList(actionStatusOpen, actionStatusProgress)));
+        actionStatusFinished.setParentActionStatuses(new HashSet<>(Arrays.asList(actionStatusOpen, actionStatusProgress)));
 
         statusRepository.saveAll(Arrays.asList(actionStatusFinished, actionStatusCancelled, actionStatusProgress, actionStatusOpen));
     }
