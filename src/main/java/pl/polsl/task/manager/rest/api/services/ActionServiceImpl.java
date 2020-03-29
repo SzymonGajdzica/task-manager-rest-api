@@ -37,7 +37,8 @@ public class ActionServiceImpl implements ActionService {
 
     @Override
     public ActionStatus getInitialStatus() {
-        return statusRepository.findAll()
+        return statusRepository
+                .findAll()
                 .stream()
                 .filter(status -> status.getParentActionStatuses().isEmpty())
                 .findFirst()
