@@ -38,6 +38,7 @@ public class RequestServiceImpl implements RequestService{
         request.setManager((Manager) currentUser);
         request.setDescription(requestPost.getDescription());
         request.setActionStatus(actionService.getInitialStatus());
+        request.setObject(objectRepository.getById(requestPost.getObjectId()));
         return requestRepository.save(request);
     }
 
