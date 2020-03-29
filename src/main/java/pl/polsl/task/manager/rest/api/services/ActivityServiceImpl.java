@@ -57,7 +57,7 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity = activityRepository.getById(activityId);
         if (activity.getEndDate() != null)
             throw new BadRequestException("Cannot update progress in already finished activity");
-        if (user.equals(activity.getWorker()) || user.equals(activity.getRequest().getManager()))
+        if (!user.equals(activity.getWorker()) && !user.equals(activity.getRequest().getManager()))
             throw new ForbiddenAccessException("Only worker assigned to activity and manager that created it can update its progress");
         return activityRepository.save(actionService.getPatchedAction(activity, actionPatch));
     }
@@ -119,6 +119,7 @@ public class ActivityServiceImpl implements ActivityService {
             activityView.setWorkerId(activity.getWorker().getId());
         if (activity.getActivityType() != null)
             activityView.setActivityTypeCode(activity.getActivityType().getCode());
+        activityView.setRequestId(activity.getRequest().getId());
         return activityView;
     }
 }
