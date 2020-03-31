@@ -1,8 +1,12 @@
 package pl.polsl.task.manager.rest.api.exceptions;
 
-public class CodeAlreadyUsedException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-    public CodeAlreadyUsedException(String code){
+@ResponseStatus(value = HttpStatus.CONFLICT)
+public class CodeAlreadyUsedException extends BaseException {
+
+    public CodeAlreadyUsedException(String code) {
         super("Code '" + code + "' already used");
     }
 

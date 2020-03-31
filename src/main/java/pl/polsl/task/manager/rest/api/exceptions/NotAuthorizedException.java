@@ -1,8 +1,12 @@
 package pl.polsl.task.manager.rest.api.exceptions;
 
-public class NotAuthorizedException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-    public NotAuthorizedException(String message){
+@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+public class NotAuthorizedException extends BaseException {
+
+    public NotAuthorizedException(String message) {
         super(message);
     }
 

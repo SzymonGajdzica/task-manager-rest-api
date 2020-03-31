@@ -16,9 +16,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import pl.polsl.task.manager.rest.api.services.AuthenticationEntryPointImpl;
-import pl.polsl.task.manager.rest.api.services.AuthenticationRequestFilterImpl;
-import pl.polsl.task.manager.rest.api.services.UserDetailsServiceImpl;
+import pl.polsl.task.manager.rest.api.services.CustomAuthenticationEntryPoint;
+import pl.polsl.task.manager.rest.api.services.CustomOncePerRequestFilter;
+import pl.polsl.task.manager.rest.api.services.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -27,7 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final UserDetailsService userDetailsService;
-    private final AuthenticationRequestFilterImpl requestFilter;
+    private final CustomOncePerRequestFilter requestFilter;
     private final BCryptPasswordEncoder passwordEncoder;
 
     private static final String[] AUTH_WHITELIST = {
@@ -43,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/**"
     };
 
-    public WebSecurityConfig(AuthenticationEntryPointImpl authenticationEntryPoint, UserDetailsServiceImpl userDetailsService, @Lazy AuthenticationRequestFilterImpl requestFilter, BCryptPasswordEncoder passwordEncoder) {
+    public WebSecurityConfig(CustomAuthenticationEntryPoint authenticationEntryPoint, CustomUserDetailsService userDetailsService, @Lazy CustomOncePerRequestFilter requestFilter, BCryptPasswordEncoder passwordEncoder) {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.userDetailsService = userDetailsService;
         this.requestFilter = requestFilter;

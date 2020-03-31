@@ -10,11 +10,11 @@ import pl.polsl.task.manager.rest.api.repositories.UserRepository;
 import java.util.ArrayList;
 
 @Component
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
 	private final UserRepository userRepository;
 
-	public UserDetailsServiceImpl(UserRepository userRepository) {
+	public CustomUserDetailsService(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 
