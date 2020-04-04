@@ -3,7 +3,6 @@ package pl.polsl.task.manager.rest.api.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.services.UserService;
 import pl.polsl.task.manager.rest.api.views.UserPatch;
 import pl.polsl.task.manager.rest.api.views.UserRolePatch;
@@ -11,7 +10,6 @@ import pl.polsl.task.manager.rest.api.views.UserView;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/user")
@@ -27,20 +25,17 @@ public class UserController {
     public UserView updateRole(@ApiIgnore @RequestHeader(value = "Authorization") String token,
                                @PathVariable Long userId,
                                @RequestBody UserRolePatch userRolePatch) {
-        User user = userService.getUserWithPatchedRole(token, userId, userRolePatch);
-        return userService.serialize(user);
+        return userService.getUserWithPatchedRole(token, userId, userRolePatch);
     }
 
     @GetMapping(value = "/self", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserView getUser(@ApiIgnore @RequestHeader(value = "Authorization") String token) {
-        User user = userService.getUser(token);
-        return userService.serialize(user);
+        return userService.getUser(token);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<UserView> getUsers() {
-        List<User> users = userService.getUsers();
-        return users.stream().map(userService::serialize).collect(Collectors.toList());
+        return userService.getUsers();
     }
 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
@@ -53,8 +48,7 @@ public class UserController {
     @PatchMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserView updateUser(@ApiIgnore @RequestHeader(value = "Authorization") String token,
                                @RequestBody UserPatch userPatch) {
-        User user = userService.getPatchedUser(token, userPatch);
-        return userService.serialize(user);
+        return userService.getPatchedUser(token, userPatch);
     }
 
 }

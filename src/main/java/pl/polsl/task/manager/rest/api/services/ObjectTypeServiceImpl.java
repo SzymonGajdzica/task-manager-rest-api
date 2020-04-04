@@ -1,5 +1,6 @@
 package pl.polsl.task.manager.rest.api.services;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.CodeAlreadyUsedException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
@@ -13,47 +14,51 @@ import pl.polsl.task.manager.rest.api.views.CodeNamePost;
 import pl.polsl.task.manager.rest.api.views.CodeNameView;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ObjectTypeServiceImpl implements ObjectTypeService {
 
     private final ObjectTypeRepository objectTypeRepository;
     private final AuthenticationService authenticationService;
-    private final CodeNameService codeNameService;
+    private final ModelMapper modelMapper;
 
-    public ObjectTypeServiceImpl(ObjectTypeRepository objectTypeRepository, AuthenticationService authenticationService, CodeNameService codeNameService) {
+    public ObjectTypeServiceImpl(ObjectTypeRepository objectTypeRepository, AuthenticationService authenticationService, ModelMapper modelMapper) {
         this.objectTypeRepository = objectTypeRepository;
         this.authenticationService = authenticationService;
-        this.codeNameService = codeNameService;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public ObjectType createObjectType(String token, CodeNamePost codeNamePost) {
-        codeNameService.validateIfUserCanModify(token);
+    public CodeNameView createObjectType(String token, CodeNamePost codeNamePost) {
+        validateIfUserCanModify(token);
         if (objectTypeRepository.existsById(codeNamePost.getCode()))
             throw new CodeAlreadyUsedException(codeNamePost.getCode());
-        ObjectType objectType = codeNameService.getPatchedCodeName(new ObjectType(), codeNamePost);
-        return objectTypeRepository.save(objectType);
+        ObjectType objectType = modelMapper.map(codeNamePost, ObjectType.class);
+        return modelMapper.map(objectTypeRepository.save(objectType), CodeNameView.class);
     }
 
     @Override
-    public ObjectType getPatchedObjectType(String token, String objectTypeCode, CodeNamePatch codeNamePatch) {
-        codeNameService.validateIfUserCanModify(token);
+    public CodeNameView getPatchedObjectType(String token, String objectTypeCode, CodeNamePatch codeNamePatch) {
+        validateIfUserCanModify(token);
         ObjectType objectType = objectTypeRepository.getById(objectTypeCode);
-        return objectTypeRepository.save(codeNameService.getPatchedCodeName(objectType, codeNamePatch));
+        modelMapper.map(codeNamePatch, objectType);
+        return modelMapper.map(objectTypeRepository.save(objectType), CodeNameView.class);
     }
 
     @Override
-    public List<ObjectType> getObjectsTypes(String token) {
+    public List<CodeNameView> getObjectsTypes(String token) {
         User currentUser = authenticationService.getUserFromToken(token);
         if (!(currentUser instanceof Manager || currentUser instanceof Client))
             throw new ForbiddenAccessException(Manager.class, Client.class);
-        return objectTypeRepository.findAll();
+        List<ObjectType> objectTypes = objectTypeRepository.findAll();
+        return objectTypes.stream().map(objectType -> modelMapper.map(objectType, CodeNameView.class)).collect(Collectors.toList());
     }
 
-    @Override
-    public CodeNameView serialize(ObjectType objectType) {
-        return codeNameService.serialize(objectType);
+    private void validateIfUserCanModify(String token) {
+        User user = authenticationService.getUserFromToken(token);
+        if (!(user instanceof Manager))
+            throw new ForbiddenAccessException(Manager.class);
     }
 
 }

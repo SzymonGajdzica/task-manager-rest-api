@@ -3,6 +3,7 @@ package pl.polsl.task.manager.rest.api.services;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,7 @@ import pl.polsl.task.manager.rest.api.repositories.UserRepository;
 import pl.polsl.task.manager.rest.api.views.AuthenticationPost;
 import pl.polsl.task.manager.rest.api.views.AuthenticationView;
 import pl.polsl.task.manager.rest.api.views.UserPost;
+import pl.polsl.task.manager.rest.api.views.UserView;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -30,12 +32,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final ModelMapper modelMapper;
 
-    public AuthenticationServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AuthenticationServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.modelMapper = modelMapper;
     }
 
     private Date getExpirationDateFromToken(String token) {
@@ -77,16 +81,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public User registerUser(UserPost userPost) {
+    public UserView registerUser(UserPost userPost) {
         User user = new User();
         user.setUsername(userPost.getUsername());
-        if(userRepository.findByUsername(user.getUsername()).isPresent())
+        if (userRepository.findByUsername(user.getUsername()).isPresent())
             throw new UsernameAlreadyUsedException(user.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(userPost.getPassword()));
         user.setEmail(userPost.getEmail());
         user.setSurname(userPost.getSurname());
         user.setName(userPost.getName());
-        return userRepository.save(user);
+        return modelMapper.map(userRepository.save(user), UserView.class);
     }
 
     @Override

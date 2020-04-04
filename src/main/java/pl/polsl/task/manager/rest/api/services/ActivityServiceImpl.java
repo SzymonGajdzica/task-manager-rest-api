@@ -1,5 +1,6 @@
 package pl.polsl.task.manager.rest.api.services;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.BadRequestException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
@@ -17,6 +18,7 @@ import pl.polsl.task.manager.rest.api.views.ActivityPost;
 import pl.polsl.task.manager.rest.api.views.ActivityView;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ActivityServiceImpl implements ActivityService {
@@ -27,68 +29,72 @@ public class ActivityServiceImpl implements ActivityService {
     private final ActivityTypeRepository activityTypeRepository;
     private final AuthenticationService authenticationService;
     private final ActionService actionService;
+    private final ModelMapper modelMapper;
 
-    public ActivityServiceImpl(ActivityRepository activityRepository, RequestRepository requestRepository, UserRepository userRepository, ActivityTypeRepository activityTypeRepository, AuthenticationService authenticationService, ActionService actionService) {
+    public ActivityServiceImpl(ActivityRepository activityRepository, RequestRepository requestRepository, UserRepository userRepository, ActivityTypeRepository activityTypeRepository, AuthenticationService authenticationService, ActionService actionService, ModelMapper modelMapper) {
         this.activityRepository = activityRepository;
         this.requestRepository = requestRepository;
         this.userRepository = userRepository;
         this.activityTypeRepository = activityTypeRepository;
         this.authenticationService = authenticationService;
         this.actionService = actionService;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public Activity createActivity(String token, ActivityPost activityPost) {
+    public ActivityView createActivity(String token, ActivityPost activityPost) {
         User manager = authenticationService.getUserFromToken(token);
         Request request = requestRepository.getById(activityPost.getRequestId());
         if (!manager.equals(request.getManager()))
             throw new ForbiddenAccessException("Only manager that created request can add activities to it");
-        Activity activity = new Activity();
+        Activity activity = modelMapper.map(activityPost, Activity.class);
         updateActivityTypeAndWorker(activity, activityPost.getActivityTypeCode(), activityPost.getWorkerId());
         activity.setRequest(request);
-        activity.setDescription(activityPost.getDescription());
         activity.setActionStatus(actionService.getInitialStatus());
-        return activityRepository.save(activity);
+        return modelMapper.map(activityRepository.save(activity), ActivityView.class);
     }
 
     @Override
-    public Activity getPatchedActivity(String token, Long activityId, ActionPatch actionPatch) {
+    public ActivityView getPatchedActivity(String token, Long activityId, ActionPatch actionPatch) {
         User user = authenticationService.getUserFromToken(token);
         Activity activity = activityRepository.getById(activityId);
         if (activity.getEndDate() != null)
             throw new BadRequestException("Cannot update progress in already finished activity");
         if (!user.equals(activity.getWorker()) && !user.equals(activity.getRequest().getManager()))
             throw new ForbiddenAccessException("Only worker assigned to activity and manager that created it can update its progress");
-        return activityRepository.save(actionService.getPatchedAction(activity, actionPatch));
+        modelMapper.map(actionPatch, actionPatch);
+        actionService.patchAction(actionPatch, activity);
+        return modelMapper.map(activityRepository.save(activity), ActivityView.class);
     }
 
     @Override
-    public Activity getPatchedActivity(String token, Long activityId, ActivityPatch activityPatch) {
+    public ActivityView getPatchedActivity(String token, Long activityId, ActivityPatch activityPatch) {
         User currentUser = authenticationService.getUserFromToken(token);
         Activity activity = activityRepository.getById(activityId);
         if (!currentUser.equals(activity.getRequest().getManager()))
             throw new ForbiddenAccessException("Only manager that created request can update its parameters");
         updateActivityTypeAndWorker(activity, activityPatch.getActivityTypeCode(), activityPatch.getWorkerId());
-        if (activityPatch.getDescription() != null)
-            activity.setDescription(activityPatch.getDescription());
-        return activityRepository.save(activity);
+        modelMapper.map(activity, activityPatch);
+        return modelMapper.map(activityRepository.save(activity), ActivityView.class);
     }
 
     @Override
-    public List<Activity> getRequestActivities(String token, Long requestId) {
+    public List<ActivityView> getRequestActivities(String token, Long requestId) {
         User currentUser = authenticationService.getUserFromToken(token);
         Request request = requestRepository.getById(requestId);
         if (!currentUser.equals(request.getManager()))
             throw new ForbiddenAccessException("Only manager that created request can retrieve its activities");
-        return request.getActivities();
+        List<Activity> activities = request.getActivities();
+        return activities.stream().map(activity -> modelMapper.map(activity, ActivityView.class)).collect(Collectors.toList());
     }
 
     @Override
-    public List<Activity> getWorkerActivities(String token) {
+    public List<ActivityView> getWorkerActivities(String token) {
         User currentUser = authenticationService.getUserFromToken(token);
         if (!(currentUser instanceof Worker))
             throw new BadRequestException("This request is designed for workers");
-        return ((Worker) currentUser).getActivities();
+        List<Activity> activities = ((Worker) currentUser).getActivities();
+        return activities.stream().map(activity -> modelMapper.map(activity, ActivityView.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -111,15 +117,4 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    @Override
-    public ActivityView serialize(Activity activity) {
-        ActivityView activityView = actionService.serialize(activity, new ActivityView());
-        activityView.setStatusCode(activity.getActionStatus().getCode());
-        if (activity.getWorker() != null)
-            activityView.setWorkerId(activity.getWorker().getId());
-        if (activity.getActivityType() != null)
-            activityView.setActivityTypeCode(activity.getActivityType().getCode());
-        activityView.setRequestId(activity.getRequest().getId());
-        return activityView;
-    }
 }

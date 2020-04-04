@@ -1,5 +1,6 @@
 package pl.polsl.task.manager.rest.api.services;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.BadRequestException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
@@ -15,6 +16,7 @@ import pl.polsl.task.manager.rest.api.views.ObjectPost;
 import pl.polsl.task.manager.rest.api.views.ObjectView;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ObjectServiceImpl implements ObjectService {
@@ -23,44 +25,47 @@ public class ObjectServiceImpl implements ObjectService {
     private final AuthenticationService authenticationService;
     private final ObjectTypeRepository objectTypeRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
-    public ObjectServiceImpl(ObjectRepository objectRepository, AuthenticationService authenticationService, ObjectTypeRepository objectTypeRepository, UserRepository userRepository) {
+    public ObjectServiceImpl(ObjectRepository objectRepository, AuthenticationService authenticationService, ObjectTypeRepository objectTypeRepository, UserRepository userRepository, ModelMapper modelMapper) {
         this.objectRepository = objectRepository;
         this.authenticationService = authenticationService;
         this.objectTypeRepository = objectTypeRepository;
         this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public Object createObject(String token, ObjectPost objectPost) {
+    public ObjectView createObject(String token, ObjectPost objectPost) {
         checkModifyPermission(token);
-        Object object = new Object();
+        Object object = modelMapper.map(objectPost, Object.class);
         User client = userRepository.getById(objectPost.getClientId());
         if (!(client instanceof Client))
             throw new BadRequestException("clientId does not point at Client");
         object.setClient((Client) client);
         object.setObjectType(objectTypeRepository.getById(objectPost.getObjectTypeCode()));
-        object.setName(objectPost.getName());
-        return objectRepository.save(object);
+        return modelMapper.map(objectRepository.save(object), ObjectView.class);
     }
 
     @Override
-    public Object getPatchedObject(String token, Long objectId, ObjectPatch objectPatch) {
+    public ObjectView getPatchedObject(String token, Long objectId, ObjectPatch objectPatch) {
         checkModifyPermission(token);
         Object object = objectRepository.getById(objectId);
-        if (objectPatch.getName() != null)
-            object.setName(objectPatch.getName());
-        return objectRepository.save(object);
+        modelMapper.map(objectPatch, object);
+        return modelMapper.map(objectRepository.save(object), ObjectView.class);
     }
 
     @Override
-    public List<Object> getObjects(String token) {
+    public List<ObjectView> getObjects(String token) {
         User user = authenticationService.getUserFromToken(token);
+        List<Object> objects = null;
         if (user instanceof Client)
-            return ((Client) user).getObjects();
+            objects = ((Client) user).getObjects();
         if (user instanceof Manager)
-            return objectRepository.findAll();
-        throw new ForbiddenAccessException(Manager.class, Client.class);
+            objects = objectRepository.findAll();
+        if (objects == null)
+            throw new ForbiddenAccessException(Manager.class, Client.class);
+        return objects.stream().map(object -> modelMapper.map(object, ObjectView.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -73,16 +78,6 @@ public class ObjectServiceImpl implements ObjectService {
         User user = authenticationService.getUserFromToken(token);
         if (!(user instanceof Manager))
             throw new ForbiddenAccessException(Manager.class);
-    }
-
-    @Override
-    public ObjectView serialize(Object object) {
-        ObjectView objectView = new ObjectView();
-        objectView.setId(object.getId());
-        objectView.setClientId(object.getClient().getId());
-        objectView.setName(object.getName());
-        objectView.setObjectTypeCode(object.getObjectType().getCode());
-        return objectView;
     }
 
 }

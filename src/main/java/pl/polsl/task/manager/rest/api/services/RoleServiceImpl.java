@@ -1,5 +1,6 @@
 package pl.polsl.task.manager.rest.api.services;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.models.*;
 import pl.polsl.task.manager.rest.api.repositories.RoleRepository;
@@ -7,19 +8,23 @@ import pl.polsl.task.manager.rest.api.views.CodeNameView;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
+    private final ModelMapper modelMapper;
 
-    public RoleServiceImpl(RoleRepository roleRepository) {
+    public RoleServiceImpl(RoleRepository roleRepository, ModelMapper modelMapper) {
         this.roleRepository = roleRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public List<Role> getRoles() {
-        return roleRepository.findAll();
+    public List<CodeNameView> getRoles() {
+        List<Role> roles = roleRepository.findAll();
+        return roles.stream().map(role -> modelMapper.map(role, CodeNameView.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -43,11 +48,4 @@ public class RoleServiceImpl implements RoleService {
         roleRepository.saveAll(Arrays.asList(adminRole, clientRole, managerRole, workerRole));
     }
 
-    @Override
-    public CodeNameView serialize(Role role) {
-        CodeNameView codeNameView = new CodeNameView();
-        codeNameView.setCode(role.getCode());
-        codeNameView.setName(role.getName());
-        return codeNameView;
-    }
 }

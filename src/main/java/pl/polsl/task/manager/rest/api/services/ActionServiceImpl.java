@@ -6,7 +6,6 @@ import pl.polsl.task.manager.rest.api.models.Action;
 import pl.polsl.task.manager.rest.api.models.ActionStatus;
 import pl.polsl.task.manager.rest.api.repositories.StatusRepository;
 import pl.polsl.task.manager.rest.api.views.ActionPatch;
-import pl.polsl.task.manager.rest.api.views.ActionView;
 
 import java.util.Date;
 
@@ -20,7 +19,7 @@ public class ActionServiceImpl implements ActionService {
     }
 
     @Override
-    public <T extends Action> T getPatchedAction(T action, ActionPatch actionPatch) {
+    public <T extends Action> void patchAction(ActionPatch actionPatch, T action) {
         String statusCode = actionPatch.getStatusCode();
         if (statusCode != null) {
             ActionStatus actionStatus = statusRepository.getById(statusCode);
@@ -32,7 +31,6 @@ public class ActionServiceImpl implements ActionService {
                 action.setEndDate(new Date());
             }
         }
-        return action;
     }
 
     @Override
@@ -45,14 +43,4 @@ public class ActionServiceImpl implements ActionService {
                 .orElseThrow(() -> new RuntimeException("Not found initial status"));
     }
 
-    @Override
-    public <T extends ActionView> T serialize(Action action, T actionView) {
-        actionView.setId(action.getId());
-        actionView.setDescription(action.getDescription());
-        actionView.setStatusCode(action.getActionStatus().getCode());
-        actionView.setResult(action.getResult());
-        actionView.setRegisterDate(action.getRegisterDate());
-        actionView.setEndDate(action.getEndDate());
-        return actionView;
-    }
 }

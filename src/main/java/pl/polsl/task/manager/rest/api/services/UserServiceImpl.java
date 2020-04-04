@@ -1,5 +1,6 @@
 package pl.polsl.task.manager.rest.api.services;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import pl.polsl.task.manager.rest.api.views.UserRolePatch;
 import pl.polsl.task.manager.rest.api.views.UserView;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserServiceImpl implements UserService {
@@ -21,34 +23,31 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationService authenticationService;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final ModelMapper modelMapper;
 
-    public UserServiceImpl(UserRepository userRepository, AuthenticationService authenticationService, RoleRepository roleRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationService authenticationService, RoleRepository roleRepository, BCryptPasswordEncoder bCryptPasswordEncoder, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.authenticationService = authenticationService;
         this.roleRepository = roleRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public User getUser(String token) {
-        return authenticationService.getUserFromToken(token);
+    public UserView getUser(String token) {
+        return modelMapper.map(authenticationService.getUserFromToken(token), UserView.class);
     }
 
     @Override
-    public User getPatchedUser(String token, UserPatch userPatch) {
-        User currentUser = getUser(token);
-        if(userPatch.getName() != null)
-            currentUser.setName(userPatch.getName());
-        if(userPatch.getSurname() != null)
-            currentUser.setSurname(userPatch.getSurname());
-        if(userPatch.getEmail() != null)
-            currentUser.setEmail(userPatch.getEmail());
-        return currentUser;
+    public UserView getPatchedUser(String token, UserPatch userPatch) {
+        User currentUser = authenticationService.getUserFromToken(token);
+        modelMapper.map(userPatch, currentUser);
+        return modelMapper.map(currentUser, UserView.class);
     }
 
     @Override
-    public User getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch) {
-        User currentUser = getUser(token);
+    public UserView getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch) {
+        User currentUser = authenticationService.getUserFromToken(token);
         User userToUpdate = userRepository.getById(userId);
         if (!(currentUser instanceof Admin))
             throw new ForbiddenAccessException(Admin.class);
@@ -59,7 +58,7 @@ public class UserServiceImpl implements UserService {
         else
             userToUpdate.setRole(null);
         userRepository.updateRole(userToUpdate.getId(), getClassName(userRolePatch.getRoleCode()));
-        return userRepository.save(userToUpdate);
+        return modelMapper.map(userToUpdate, UserView.class);
     }
 
     private String getClassName(@Nullable String roleCode) {
@@ -81,15 +80,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(String token, Long userId) {
-        User currentUser = getUser(token);
+        User currentUser = authenticationService.getUserFromToken(token);
         if (!(currentUser instanceof Admin))
             throw new ForbiddenAccessException(Admin.class);
         userRepository.delete(userRepository.getById(userId));
     }
 
     @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserView> getUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(user -> modelMapper.map(user, UserView.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -104,16 +104,4 @@ public class UserServiceImpl implements UserService {
         userRepository.save(admin);
     }
 
-    @Override
-    public UserView serialize(User user) {
-        UserView userView = new UserView();
-        userView.setId(user.getId());
-        userView.setName(user.getName());
-        userView.setEmail(user.getEmail());
-        userView.setSurname(user.getSurname());
-        userView.setUsername(user.getUsername());
-        if (user.getRole() != null)
-            userView.setRoleCode(user.getRole().getCode());
-        return userView;
-    }
 }

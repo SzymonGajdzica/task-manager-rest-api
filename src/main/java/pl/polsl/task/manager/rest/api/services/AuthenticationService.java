@@ -5,6 +5,7 @@ import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.views.AuthenticationPost;
 import pl.polsl.task.manager.rest.api.views.AuthenticationView;
 import pl.polsl.task.manager.rest.api.views.UserPost;
+import pl.polsl.task.manager.rest.api.views.UserView;
 
 public interface AuthenticationService {
 
@@ -12,7 +13,7 @@ public interface AuthenticationService {
     User getUserFromToken(String token);
 
     @NonNull
-    User registerUser(UserPost userPost);
+    UserView registerUser(UserPost userPost);
 
     @NonNull
     AuthenticationView loginUser(AuthenticationPost authenticationPost);

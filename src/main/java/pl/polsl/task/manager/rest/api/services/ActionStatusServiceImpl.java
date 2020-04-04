@@ -1,5 +1,6 @@
 package pl.polsl.task.manager.rest.api.services;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.models.ActionStatus;
 import pl.polsl.task.manager.rest.api.models.CodeEntity;
@@ -16,14 +17,17 @@ import java.util.stream.Collectors;
 public class ActionStatusServiceImpl implements ActionStatusService {
 
     private final StatusRepository statusRepository;
+    private final ModelMapper modelMapper;
 
-    public ActionStatusServiceImpl(StatusRepository statusRepository) {
+    public ActionStatusServiceImpl(StatusRepository statusRepository, ModelMapper modelMapper) {
         this.statusRepository = statusRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public List<ActionStatus> getAvailableStatuses() {
-        return statusRepository.findAll();
+    public List<ActionStatusView> getAvailableStatuses() {
+        List<ActionStatus> actionStatuses = statusRepository.findAll();
+        return actionStatuses.stream().map(this::serialize).collect(Collectors.toList());
     }
 
     @Override
@@ -55,11 +59,8 @@ public class ActionStatusServiceImpl implements ActionStatusService {
         statusRepository.saveAll(Arrays.asList(actionStatusFinished, actionStatusCancelled, actionStatusProgress, actionStatusOpen));
     }
 
-    @Override
-    public ActionStatusView serialize(ActionStatus actionStatus) {
-        ActionStatusView actionStatusView = new ActionStatusView();
-        actionStatusView.setCode(actionStatus.getCode());
-        actionStatusView.setName(actionStatus.getCode());
+    private ActionStatusView serialize(ActionStatus actionStatus) {
+        ActionStatusView actionStatusView = modelMapper.map(actionStatus, ActionStatusView.class);
         List<String> childrenCode = actionStatus.getChildActionStatuses()
                 .stream()
                 .map(CodeEntity::getCode)

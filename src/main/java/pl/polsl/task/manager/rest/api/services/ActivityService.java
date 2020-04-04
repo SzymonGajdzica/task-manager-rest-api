@@ -1,7 +1,6 @@
 package pl.polsl.task.manager.rest.api.services;
 
 import org.springframework.lang.NonNull;
-import pl.polsl.task.manager.rest.api.models.Activity;
 import pl.polsl.task.manager.rest.api.views.ActionPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPost;
@@ -12,23 +11,20 @@ import java.util.List;
 public interface ActivityService {
 
     @NonNull
-    Activity createActivity(String token, ActivityPost activityPost);
+    ActivityView createActivity(String token, ActivityPost activityPost);
 
     @NonNull
-    Activity getPatchedActivity(String token, Long activityId, ActionPatch actionPatch);
+    ActivityView getPatchedActivity(String token, Long activityId, ActionPatch actionPatch);
 
     @NonNull
-    Activity getPatchedActivity(String token, Long activityId, ActivityPatch activityPatch);
+    ActivityView getPatchedActivity(String token, Long activityId, ActivityPatch activityPatch);
 
     @NonNull
-    List<Activity> getRequestActivities(String token, Long requestId);
+    List<ActivityView> getRequestActivities(String token, Long requestId);
 
     @NonNull
-    List<Activity> getWorkerActivities(String token);
+    List<ActivityView> getWorkerActivities(String token);
 
     void deleteActivity(String token, Long activityId);
-
-    @NonNull
-    ActivityView serialize(Activity activity);
 
 }
