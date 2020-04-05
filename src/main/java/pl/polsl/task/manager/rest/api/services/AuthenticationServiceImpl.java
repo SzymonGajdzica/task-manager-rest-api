@@ -3,20 +3,15 @@ package pl.polsl.task.manager.rest.api.services;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.NotAuthorizedException;
-import pl.polsl.task.manager.rest.api.exceptions.UsernameAlreadyUsedException;
 import pl.polsl.task.manager.rest.api.models.User;
 import pl.polsl.task.manager.rest.api.repositories.UserRepository;
 import pl.polsl.task.manager.rest.api.views.AuthenticationPost;
 import pl.polsl.task.manager.rest.api.views.AuthenticationView;
-import pl.polsl.task.manager.rest.api.views.UserPost;
-import pl.polsl.task.manager.rest.api.views.UserView;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -31,15 +26,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final ModelMapper modelMapper;
 
-    public AuthenticationServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, ModelMapper modelMapper) {
+    public AuthenticationServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.modelMapper = modelMapper;
     }
 
     private Date getExpirationDateFromToken(String token) {
@@ -78,19 +69,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }catch (Exception e){
             throw new NotAuthorizedException(e.getMessage());
         }
-    }
-
-    @Override
-    public UserView registerUser(UserPost userPost) {
-        User user = new User();
-        user.setUsername(userPost.getUsername());
-        if (userRepository.findByUsername(user.getUsername()).isPresent())
-            throw new UsernameAlreadyUsedException(user.getUsername());
-        user.setPassword(bCryptPasswordEncoder.encode(userPost.getPassword()));
-        user.setEmail(userPost.getEmail());
-        user.setSurname(userPost.getSurname());
-        user.setName(userPost.getName());
-        return modelMapper.map(userRepository.save(user), UserView.class);
     }
 
     @Override

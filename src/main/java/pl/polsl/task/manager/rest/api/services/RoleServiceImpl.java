@@ -1,7 +1,7 @@
 package pl.polsl.task.manager.rest.api.services;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+import pl.polsl.task.manager.rest.api.mappers.CodeNameMapper;
 import pl.polsl.task.manager.rest.api.models.*;
 import pl.polsl.task.manager.rest.api.repositories.RoleRepository;
 import pl.polsl.task.manager.rest.api.views.CodeNameView;
@@ -14,21 +14,21 @@ import java.util.stream.Collectors;
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
-    private final ModelMapper modelMapper;
+    private final CodeNameMapper codeNameMapper;
 
-    public RoleServiceImpl(RoleRepository roleRepository, ModelMapper modelMapper) {
+    public RoleServiceImpl(RoleRepository roleRepository, CodeNameMapper codeNameMapper) {
         this.roleRepository = roleRepository;
-        this.modelMapper = modelMapper;
+        this.codeNameMapper = codeNameMapper;
     }
 
     @Override
     public List<CodeNameView> getRoles() {
         List<Role> roles = roleRepository.findAll();
-        return roles.stream().map(role -> modelMapper.map(role, CodeNameView.class)).collect(Collectors.toList());
+        return roles.stream().map(codeNameMapper::map).collect(Collectors.toList());
     }
 
     @Override
-    public void createInitialData() throws Exception {
+    public void createInitialData() throws RuntimeException {
         Role adminRole = new Role();
         adminRole.setCode("ADM");
         adminRole.setName(Admin.class.getSimpleName());

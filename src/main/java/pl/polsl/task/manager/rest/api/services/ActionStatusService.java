@@ -10,6 +10,6 @@ public interface ActionStatusService {
     @NonNull
     List<ActionStatusView> getAvailableStatuses();
 
-    void createInitialData() throws Exception;
+    void createInitialData() throws RuntimeException;
 
 }

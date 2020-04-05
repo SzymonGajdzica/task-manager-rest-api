@@ -5,7 +5,7 @@ import pl.polsl.task.manager.rest.api.exceptions.BadRequestException;
 import pl.polsl.task.manager.rest.api.models.Action;
 import pl.polsl.task.manager.rest.api.models.ActionStatus;
 import pl.polsl.task.manager.rest.api.repositories.StatusRepository;
-import pl.polsl.task.manager.rest.api.views.ActionPatch;
+import pl.polsl.task.manager.rest.api.views.ActionProgressPatch;
 
 import java.util.Date;
 
@@ -19,15 +19,14 @@ public class ActionServiceImpl implements ActionService {
     }
 
     @Override
-    public <T extends Action> void patchAction(ActionPatch actionPatch, T action) {
-        String statusCode = actionPatch.getStatusCode();
-        if (statusCode != null) {
-            ActionStatus actionStatus = statusRepository.getById(statusCode);
+    public <T extends Action> void patchAction(ActionProgressPatch actionProgressPatch, T action) {
+        if (actionProgressPatch.getStatusCode() != null) {
+            ActionStatus actionStatus = statusRepository.getById(actionProgressPatch.getStatusCode());
             if (!action.getActionStatus().getChildActionStatuses().contains(actionStatus))
                 throw new BadRequestException("Status broke requested flow");
             action.setActionStatus(actionStatus);
             if (actionStatus.getChildActionStatuses().isEmpty()) {
-                action.setResult(action.getResult());
+                action.setResult(actionProgressPatch.getResult());
                 action.setEndDate(new Date());
             }
         }

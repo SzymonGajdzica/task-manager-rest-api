@@ -1,7 +1,7 @@
 package pl.polsl.task.manager.rest.api.services;
 
 import org.springframework.lang.NonNull;
-import pl.polsl.task.manager.rest.api.views.ActionPatch;
+import pl.polsl.task.manager.rest.api.views.ActionProgressPatch;
 import pl.polsl.task.manager.rest.api.views.RequestPatch;
 import pl.polsl.task.manager.rest.api.views.RequestPost;
 import pl.polsl.task.manager.rest.api.views.RequestView;
@@ -14,7 +14,7 @@ public interface RequestService {
     RequestView createRequest(String token, RequestPost requestPost);
 
     @NonNull
-    RequestView getPatchedRequest(String token, Long requestId, ActionPatch actionPatch);
+    RequestView getPatchedRequest(String token, Long requestId, ActionProgressPatch actionProgressPatch);
 
     @NonNull
     RequestView getPatchedRequest(String token, Long requestId, RequestPatch requestPatch);

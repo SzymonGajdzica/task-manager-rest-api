@@ -1,9 +1,9 @@
 package pl.polsl.task.manager.rest.api.services;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.CodeAlreadyUsedException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
+import pl.polsl.task.manager.rest.api.mappers.CodeNameMapper;
 import pl.polsl.task.manager.rest.api.models.Client;
 import pl.polsl.task.manager.rest.api.models.Manager;
 import pl.polsl.task.manager.rest.api.models.ObjectType;
@@ -21,12 +21,12 @@ public class ObjectTypeServiceImpl implements ObjectTypeService {
 
     private final ObjectTypeRepository objectTypeRepository;
     private final AuthenticationService authenticationService;
-    private final ModelMapper modelMapper;
+    private final CodeNameMapper codeNameMapper;
 
-    public ObjectTypeServiceImpl(ObjectTypeRepository objectTypeRepository, AuthenticationService authenticationService, ModelMapper modelMapper) {
+    public ObjectTypeServiceImpl(ObjectTypeRepository objectTypeRepository, AuthenticationService authenticationService, CodeNameMapper codeNameMapper) {
         this.objectTypeRepository = objectTypeRepository;
         this.authenticationService = authenticationService;
-        this.modelMapper = modelMapper;
+        this.codeNameMapper = codeNameMapper;
     }
 
     @Override
@@ -34,16 +34,17 @@ public class ObjectTypeServiceImpl implements ObjectTypeService {
         validateIfUserCanModify(token);
         if (objectTypeRepository.existsById(codeNamePost.getCode()))
             throw new CodeAlreadyUsedException(codeNamePost.getCode());
-        ObjectType objectType = modelMapper.map(codeNamePost, ObjectType.class);
-        return modelMapper.map(objectTypeRepository.save(objectType), CodeNameView.class);
+        ObjectType objectType = new ObjectType();
+        codeNameMapper.map(codeNamePost, objectType);
+        return codeNameMapper.map(objectTypeRepository.save(objectType));
     }
 
     @Override
     public CodeNameView getPatchedObjectType(String token, String objectTypeCode, CodeNamePatch codeNamePatch) {
         validateIfUserCanModify(token);
         ObjectType objectType = objectTypeRepository.getById(objectTypeCode);
-        modelMapper.map(codeNamePatch, objectType);
-        return modelMapper.map(objectTypeRepository.save(objectType), CodeNameView.class);
+        codeNameMapper.map(codeNamePatch, objectType);
+        return codeNameMapper.map(objectTypeRepository.save(objectType));
     }
 
     @Override
@@ -52,7 +53,7 @@ public class ObjectTypeServiceImpl implements ObjectTypeService {
         if (!(currentUser instanceof Manager || currentUser instanceof Client))
             throw new ForbiddenAccessException(Manager.class, Client.class);
         List<ObjectType> objectTypes = objectTypeRepository.findAll();
-        return objectTypes.stream().map(objectType -> modelMapper.map(objectType, CodeNameView.class)).collect(Collectors.toList());
+        return objectTypes.stream().map(codeNameMapper::map).collect(Collectors.toList());
     }
 
     private void validateIfUserCanModify(String token) {

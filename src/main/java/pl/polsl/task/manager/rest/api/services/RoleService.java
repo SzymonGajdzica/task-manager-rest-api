@@ -10,6 +10,6 @@ public interface RoleService {
     @NonNull
     List<CodeNameView> getRoles();
 
-    void createInitialData() throws Exception;
+    void createInitialData() throws RuntimeException;
 
 }

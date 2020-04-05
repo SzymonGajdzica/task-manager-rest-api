@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import pl.polsl.task.manager.rest.api.services.ActivityService;
-import pl.polsl.task.manager.rest.api.views.ActionPatch;
+import pl.polsl.task.manager.rest.api.views.ActionProgressPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPatch;
 import pl.polsl.task.manager.rest.api.views.ActivityPost;
 import pl.polsl.task.manager.rest.api.views.ActivityView;
@@ -32,8 +32,8 @@ public class ActivityController {
     @PatchMapping(value = "/progress/{activityId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ActivityView updateActivityProgress(@ApiIgnore @RequestHeader(value = "Authorization") String token,
                                                @PathVariable Long activityId,
-                                               @RequestBody ActionPatch actionPatch) {
-        return activityService.getPatchedActivity(token, activityId, actionPatch);
+                                               @RequestBody ActionProgressPatch actionProgressPatch) {
+        return activityService.getPatchedActivity(token, activityId, actionProgressPatch);
     }
 
     @PatchMapping(value = "/{activityId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

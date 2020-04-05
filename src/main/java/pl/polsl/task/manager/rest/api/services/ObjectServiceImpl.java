@@ -1,9 +1,9 @@
 package pl.polsl.task.manager.rest.api.services;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.BadRequestException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
+import pl.polsl.task.manager.rest.api.mappers.ObjectMapper;
 import pl.polsl.task.manager.rest.api.models.Client;
 import pl.polsl.task.manager.rest.api.models.Manager;
 import pl.polsl.task.manager.rest.api.models.Object;
@@ -25,34 +25,34 @@ public class ObjectServiceImpl implements ObjectService {
     private final AuthenticationService authenticationService;
     private final ObjectTypeRepository objectTypeRepository;
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
 
-    public ObjectServiceImpl(ObjectRepository objectRepository, AuthenticationService authenticationService, ObjectTypeRepository objectTypeRepository, UserRepository userRepository, ModelMapper modelMapper) {
+    public ObjectServiceImpl(ObjectRepository objectRepository, AuthenticationService authenticationService, ObjectTypeRepository objectTypeRepository, UserRepository userRepository, ObjectMapper objectMapper) {
         this.objectRepository = objectRepository;
         this.authenticationService = authenticationService;
         this.objectTypeRepository = objectTypeRepository;
         this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public ObjectView createObject(String token, ObjectPost objectPost) {
         checkModifyPermission(token);
-        Object object = modelMapper.map(objectPost, Object.class);
+        Object object = objectMapper.map(objectPost);
         User client = userRepository.getById(objectPost.getClientId());
         if (!(client instanceof Client))
             throw new BadRequestException("clientId does not point at Client");
         object.setClient((Client) client);
         object.setObjectType(objectTypeRepository.getById(objectPost.getObjectTypeCode()));
-        return modelMapper.map(objectRepository.save(object), ObjectView.class);
+        return objectMapper.map(objectRepository.save(object));
     }
 
     @Override
     public ObjectView getPatchedObject(String token, Long objectId, ObjectPatch objectPatch) {
         checkModifyPermission(token);
         Object object = objectRepository.getById(objectId);
-        modelMapper.map(objectPatch, object);
-        return modelMapper.map(objectRepository.save(object), ObjectView.class);
+        objectMapper.map(objectPatch, object);
+        return objectMapper.map(objectRepository.save(object));
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ObjectServiceImpl implements ObjectService {
             objects = objectRepository.findAll();
         if (objects == null)
             throw new ForbiddenAccessException(Manager.class, Client.class);
-        return objects.stream().map(object -> modelMapper.map(object, ObjectView.class)).collect(Collectors.toList());
+        return objects.stream().map(objectMapper::map).collect(Collectors.toList());
     }
 
     @Override

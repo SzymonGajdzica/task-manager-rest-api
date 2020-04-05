@@ -2,18 +2,16 @@ package pl.polsl.task.manager.rest.api.views;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.Nullable;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @ToString
-public class ActivityPatch {
-
-    @ApiModelProperty(example = "Fix integer types")
-    @Nullable
-    private String description;
+public class ActivityPatch extends ActionPatch {
 
     @ApiModelProperty(example = "REF", position = 1)
     @Nullable

@@ -9,10 +9,14 @@ import org.springframework.lang.Nullable;
 @Data
 @NoArgsConstructor
 @ToString
-public abstract class ActionPatch {
+public class ActionProgressPatch {
 
-    @ApiModelProperty(example = "Fix integer types")
+    @ApiModelProperty(example = "OPN")
     @Nullable
-    private String description;
+    private String statusCode;
+
+    @ApiModelProperty(example = "Done!", position = 1)
+    @Nullable
+    private String result;
 
 }

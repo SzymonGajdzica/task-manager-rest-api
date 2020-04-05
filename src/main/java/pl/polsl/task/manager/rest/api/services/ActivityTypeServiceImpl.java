@@ -1,9 +1,9 @@
 package pl.polsl.task.manager.rest.api.services;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.CodeAlreadyUsedException;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
+import pl.polsl.task.manager.rest.api.mappers.CodeNameMapper;
 import pl.polsl.task.manager.rest.api.models.ActivityType;
 import pl.polsl.task.manager.rest.api.models.Manager;
 import pl.polsl.task.manager.rest.api.models.User;
@@ -21,12 +21,12 @@ public class ActivityTypeServiceImpl implements ActivityTypeService {
 
     private final ActivityTypeRepository activityTypeRepository;
     private final AuthenticationService authenticationService;
-    private final ModelMapper modelMapper;
+    private final CodeNameMapper codeNameMapper;
 
-    public ActivityTypeServiceImpl(ActivityTypeRepository activityTypeRepository, AuthenticationService authenticationService, ModelMapper modelMapper) {
+    public ActivityTypeServiceImpl(ActivityTypeRepository activityTypeRepository, AuthenticationService authenticationService, CodeNameMapper codeNameMapper) {
         this.activityTypeRepository = activityTypeRepository;
         this.authenticationService = authenticationService;
-        this.modelMapper = modelMapper;
+        this.codeNameMapper = codeNameMapper;
     }
 
     @Override
@@ -34,16 +34,17 @@ public class ActivityTypeServiceImpl implements ActivityTypeService {
         validateIfUserCanModify(token);
         if (activityTypeRepository.existsById(codeNamePost.getCode()))
             throw new CodeAlreadyUsedException(codeNamePost.getCode());
-        ActivityType activityType = modelMapper.map(codeNamePost, ActivityType.class);
-        return modelMapper.map(activityTypeRepository.save(activityType), CodeNameView.class);
+        ActivityType activityType = new ActivityType();
+        codeNameMapper.map(codeNamePost, activityType);
+        return codeNameMapper.map(activityTypeRepository.save(activityType));
     }
 
     @Override
     public CodeNameView getPatchedActivityType(String token, String activityTypeCode, CodeNamePatch codeNamePatch) {
         validateIfUserCanModify(token);
         ActivityType activityType = activityTypeRepository.getById(activityTypeCode);
-        modelMapper.map(codeNamePatch, activityType);
-        return modelMapper.map(activityTypeRepository.save(activityType), CodeNameView.class);
+        codeNameMapper.map(codeNamePatch, activityType);
+        return codeNameMapper.map(activityTypeRepository.save(activityType));
     }
 
     @Override
@@ -52,7 +53,7 @@ public class ActivityTypeServiceImpl implements ActivityTypeService {
         if (!(currentUser instanceof Manager || currentUser instanceof Worker))
             throw new ForbiddenAccessException(Manager.class, Worker.class);
         List<ActivityType> activityTypes = activityTypeRepository.findAll();
-        return activityTypes.stream().map(activityType -> modelMapper.map(activityType, CodeNameView.class)).collect(Collectors.toList());
+        return activityTypes.stream().map(codeNameMapper::map).collect(Collectors.toList());
     }
 
     private void validateIfUserCanModify(String token) {

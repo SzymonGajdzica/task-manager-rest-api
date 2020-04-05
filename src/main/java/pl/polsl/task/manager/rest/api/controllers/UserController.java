@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import pl.polsl.task.manager.rest.api.services.UserService;
 import pl.polsl.task.manager.rest.api.views.UserPatch;
+import pl.polsl.task.manager.rest.api.views.UserPost;
 import pl.polsl.task.manager.rest.api.views.UserRolePatch;
 import pl.polsl.task.manager.rest.api.views.UserView;
 import springfox.documentation.annotations.ApiIgnore;
@@ -19,6 +20,12 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserView registerUser(@RequestBody UserPost userPost) {
+        return userService.createUser(userPost);
     }
 
     @PatchMapping(value = "/update_role/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

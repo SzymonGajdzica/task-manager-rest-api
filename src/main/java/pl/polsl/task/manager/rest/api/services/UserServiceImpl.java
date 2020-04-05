@@ -1,15 +1,17 @@
 package pl.polsl.task.manager.rest.api.services;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import pl.polsl.task.manager.rest.api.exceptions.ForbiddenAccessException;
 import pl.polsl.task.manager.rest.api.exceptions.NotImplementedException;
+import pl.polsl.task.manager.rest.api.exceptions.UsernameAlreadyUsedException;
+import pl.polsl.task.manager.rest.api.mappers.UserMapper;
 import pl.polsl.task.manager.rest.api.models.*;
 import pl.polsl.task.manager.rest.api.repositories.RoleRepository;
 import pl.polsl.task.manager.rest.api.repositories.UserRepository;
 import pl.polsl.task.manager.rest.api.views.UserPatch;
+import pl.polsl.task.manager.rest.api.views.UserPost;
 import pl.polsl.task.manager.rest.api.views.UserRolePatch;
 import pl.polsl.task.manager.rest.api.views.UserView;
 
@@ -23,26 +25,34 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationService authenticationService;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final ModelMapper modelMapper;
+    private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository, AuthenticationService authenticationService, RoleRepository roleRepository, BCryptPasswordEncoder bCryptPasswordEncoder, ModelMapper modelMapper) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationService authenticationService, RoleRepository roleRepository, BCryptPasswordEncoder bCryptPasswordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.authenticationService = authenticationService;
         this.roleRepository = roleRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.modelMapper = modelMapper;
+        this.userMapper = userMapper;
+    }
+
+    @Override
+    public UserView createUser(UserPost userPost) {
+        if (userRepository.findByUsername(userPost.getUsername()).isPresent())
+            throw new UsernameAlreadyUsedException(userPost.getUsername());
+        User user = userMapper.map(userPost);
+        return userMapper.map(userRepository.save(user));
     }
 
     @Override
     public UserView getUser(String token) {
-        return modelMapper.map(authenticationService.getUserFromToken(token), UserView.class);
+        return userMapper.map(authenticationService.getUserFromToken(token));
     }
 
     @Override
     public UserView getPatchedUser(String token, UserPatch userPatch) {
         User currentUser = authenticationService.getUserFromToken(token);
-        modelMapper.map(userPatch, currentUser);
-        return modelMapper.map(currentUser, UserView.class);
+        userMapper.map(userPatch, currentUser);
+        return userMapper.map(currentUser);
     }
 
     @Override
@@ -58,7 +68,7 @@ public class UserServiceImpl implements UserService {
         else
             userToUpdate.setRole(null);
         userRepository.updateRole(userToUpdate.getId(), getClassName(userRolePatch.getRoleCode()));
-        return modelMapper.map(userToUpdate, UserView.class);
+        return userMapper.map(userToUpdate);
     }
 
     private String getClassName(@Nullable String roleCode) {
@@ -89,11 +99,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserView> getUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream().map(user -> modelMapper.map(user, UserView.class)).collect(Collectors.toList());
+        return users.stream().map(userMapper::map).collect(Collectors.toList());
     }
 
     @Override
-    public void createInitialData() throws Exception {
+    public void createInitialData() throws RuntimeException {
         Admin admin = new Admin();
         admin.setEmail("primaryAdmin@wp.pl");
         admin.setName("Primary");
