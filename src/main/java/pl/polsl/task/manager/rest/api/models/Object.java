@@ -30,7 +30,7 @@ public class Object extends IdEntity {
     @NonNull
     private Client client;
 
-    @OneToMany(mappedBy = "object", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "object")
     @NonNull
     private List<Request> requests = new LinkedList<>();
 }

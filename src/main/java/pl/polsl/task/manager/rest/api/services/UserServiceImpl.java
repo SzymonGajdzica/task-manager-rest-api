@@ -36,10 +36,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserView createUser(UserPost userPost) {
+    public UserView createUser(String token, UserPost userPost) {
+        User currentUser = authenticationService.getUserFromToken(token);
+        if (!(currentUser instanceof Admin))
+            throw new ForbiddenAccessException(Admin.class);
         if (userRepository.findByUsername(userPost.getUsername()).isPresent())
             throw new UsernameAlreadyUsedException(userPost.getUsername());
         User user = userMapper.map(userPost);
+        if (userPost.getRoleCode() != null)
+            user.setRole(roleRepository.getById(userPost.getRoleCode()));
         return userMapper.map(userRepository.save(user));
     }
 
@@ -86,14 +91,6 @@ public class UserServiceImpl implements UserService {
             default:
                 throw new NotImplementedException("Missing implementation for role with code " + roleCode);
         }
-    }
-
-    @Override
-    public void deleteUser(String token, Long userId) {
-        User currentUser = authenticationService.getUserFromToken(token);
-        if (!(currentUser instanceof Admin))
-            throw new ForbiddenAccessException(Admin.class);
-        userRepository.delete(userRepository.getById(userId));
     }
 
     @Override

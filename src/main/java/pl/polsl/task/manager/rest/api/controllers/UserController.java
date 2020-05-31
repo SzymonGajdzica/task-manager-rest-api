@@ -24,8 +24,9 @@ public class UserController {
 
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserView registerUser(@RequestBody UserPost userPost) {
-        return userService.createUser(userPost);
+    public UserView registerUser(@ApiIgnore @RequestHeader(value = "Authorization") String token,
+                                 @RequestBody UserPost userPost) {
+        return userService.createUser(token, userPost);
     }
 
     @PatchMapping(value = "/update_role/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,13 +44,6 @@ public class UserController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<UserView> getUsers() {
         return userService.getUsers();
-    }
-
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @DeleteMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void deleteUser(@ApiIgnore @RequestHeader(value = "Authorization") String token,
-                           @PathVariable Long userId) {
-        userService.deleteUser(token, userId);
     }
 
     @PatchMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

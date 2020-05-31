@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 @Data
 @NoArgsConstructor
@@ -30,5 +31,10 @@ public class UserPost {
     @ApiModelProperty(required = true, example = "admin", position = 4)
     @NonNull
     private String password;
+
+    @ApiModelProperty(required = true, example = "admin", position = 4)
+    @Nullable
+    private String roleCode;
+
 
 }

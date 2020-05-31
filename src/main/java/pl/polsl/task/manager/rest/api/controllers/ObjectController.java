@@ -42,8 +42,8 @@ public class ObjectController {
 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/{objectId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void deleteRequest(@ApiIgnore @RequestHeader(value = "Authorization") String token,
-                              @PathVariable Long objectId) {
+    public void deleteObject(@ApiIgnore @RequestHeader(value = "Authorization") String token,
+                             @PathVariable Long objectId) {
         objectService.deleteObject(token, objectId);
     }
 

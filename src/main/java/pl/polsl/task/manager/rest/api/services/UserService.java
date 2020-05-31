@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserService {
 
     @NonNull
-    UserView createUser(UserPost userPost);
+    UserView createUser(String token, UserPost userPost);
 
     @NonNull
     UserView getUser(String token);
@@ -21,8 +21,6 @@ public interface UserService {
 
     @NonNull
     UserView getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch);
-
-    void deleteUser(String token, Long userId);
 
     @NonNull
     List<UserView> getUsers();
