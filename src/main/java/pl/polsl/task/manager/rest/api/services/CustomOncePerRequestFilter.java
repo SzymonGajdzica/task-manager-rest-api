@@ -30,6 +30,7 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
         try {
             response.setHeader("Access-Control-Allow-Origin", "*");
             response.setHeader("Access-Control-Allow-Headers", "*");
+            response.setHeader("Access-Control-Allow-Methods", "*");
             final String token = request.getHeader("Authorization");
             String username = authenticationService.getUsernameFromToken(token);
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
