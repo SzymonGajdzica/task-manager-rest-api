@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 
 @Configuration
 public class DataSourceConfig {
-     
+
     @SuppressWarnings("rawtypes")
     @Bean
     public DataSource getDataSource() throws UnknownHostException {
@@ -21,9 +21,9 @@ public class DataSourceConfig {
             dataSourceBuilder.username("postgres");
             dataSourceBuilder.password("12345");
         } else {
-            dataSourceBuilder.url("jdbc:postgresql://ec2-54-247-169-129.eu-west-1.compute.amazonaws.com:5432/d30pnjo54sfi93");
-            dataSourceBuilder.username("fguyjifdlvweyi");
-            dataSourceBuilder.password("576870d9f31bedafda3724636fe00799235921fd3919aad57647447f914371c9");
+            dataSourceBuilder.url("jdbc:postgresql://ec2-54-75-246-118.eu-west-1.compute.amazonaws.com:5432/det0na748qdeqk");
+            dataSourceBuilder.username("siuumazxijfqjy");
+            dataSourceBuilder.password("8609935128d73f9b7834f5b721be405d9bf6c5987f152f2710cb8c2dc6f439fc");
         }
         return dataSourceBuilder.build();
     }
