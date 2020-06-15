@@ -45,7 +45,10 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.map(userPost);
         if (userPost.getRoleCode() != null)
             user.setRole(roleRepository.getById(userPost.getRoleCode()));
-        return userMapper.map(userRepository.save(user));
+        UserView userView = userMapper.map(userRepository.save(user));
+        if (userView.getRoleCode() != null)
+            userRepository.updateRole(userView.getId(), getClassName(userView.getRoleCode()));
+        return userView;
     }
 
     @Override
