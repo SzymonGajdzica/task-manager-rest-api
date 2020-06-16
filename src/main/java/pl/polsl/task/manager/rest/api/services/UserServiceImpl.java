@@ -12,14 +12,13 @@ import pl.polsl.task.manager.rest.api.repositories.RoleRepository;
 import pl.polsl.task.manager.rest.api.repositories.UserRepository;
 import pl.polsl.task.manager.rest.api.views.UserPatch;
 import pl.polsl.task.manager.rest.api.views.UserPost;
-import pl.polsl.task.manager.rest.api.views.UserRolePatch;
 import pl.polsl.task.manager.rest.api.views.UserView;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, StartUpFiller {
 
     private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
@@ -57,26 +56,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserView getPatchedUser(String token, UserPatch userPatch) {
-        User currentUser = authenticationService.getUserFromToken(token);
-        userMapper.map(userPatch, currentUser);
-        return userMapper.map(currentUser);
-    }
-
-    @Override
-    public UserView getUserWithPatchedRole(String token, Long userId, UserRolePatch userRolePatch) {
+    public UserView getPatchedUser(String token, Long userId, UserPatch userPatch) {
         User currentUser = authenticationService.getUserFromToken(token);
         User userToUpdate = userRepository.getById(userId);
         if (!(currentUser instanceof Admin))
             throw new ForbiddenAccessException(Admin.class);
         if (userToUpdate instanceof Admin)
-            throw new ForbiddenAccessException("Cannot change role of other administrator");
-        if (userRolePatch.getRoleCode() != null)
-            userToUpdate.setRole(roleRepository.getById(userRolePatch.getRoleCode()));
-        else
-            userToUpdate.setRole(null);
-        userRepository.updateRole(userToUpdate.getId(), getClassName(userRolePatch.getRoleCode()));
-        return userMapper.map(userToUpdate);
+            throw new ForbiddenAccessException("Cannot change other administrator");
+        userMapper.map(userPatch, userToUpdate);
+        if(userPatch.getPassword() != null)
+            userToUpdate.setPassword(bCryptPasswordEncoder.encode(userPatch.getPassword()));
+        if(userPatch.getHasRoleCode()) {
+            if(userPatch.getRoleCode() != null)
+                userToUpdate.setRole(roleRepository.getById(userPatch.getRoleCode()));
+            else
+                userToUpdate.setRole(null);
+            userRepository.updateRole(userToUpdate.getId(), getClassName(userPatch.getRoleCode()));
+        }
+        return userMapper.map(userRepository.save(userToUpdate));
     }
 
     private String getClassName(@Nullable String roleCode) {
@@ -112,6 +109,33 @@ public class UserServiceImpl implements UserService {
         admin.setPassword(bCryptPasswordEncoder.encode("admin1"));
         admin.setRole(roleRepository.getOne("ADM"));
         userRepository.save(admin);
+
+        Client client = new Client();
+        client.setEmail("client@wp.pl");
+        client.setName("Josh");
+        client.setSurname("Clint");
+        client.setUsername("client1");
+        client.setPassword(bCryptPasswordEncoder.encode("client1"));
+        client.setRole(roleRepository.getOne("CLI"));
+        userRepository.save(client);
+
+        Worker worker = new Worker();
+        worker.setEmail("worker@wp.pl");
+        worker.setName("Bob");
+        worker.setSurname("Worens");
+        worker.setUsername("worker1");
+        worker.setPassword(bCryptPasswordEncoder.encode("worker1"));
+        worker.setRole(roleRepository.getOne("WOR"));
+        userRepository.save(worker);
+
+        Manager manager = new Manager();
+        manager.setEmail("manager@wp.pl");
+        manager.setName("Lucian");
+        manager.setSurname("Maners");
+        manager.setUsername("manager1");
+        manager.setPassword(bCryptPasswordEncoder.encode("manager1"));
+        manager.setRole(roleRepository.getOne("MAN"));
+        userRepository.save(manager);
     }
 
 }

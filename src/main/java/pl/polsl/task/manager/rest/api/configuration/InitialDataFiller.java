@@ -3,38 +3,30 @@ package pl.polsl.task.manager.rest.api.configuration;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
-import pl.polsl.task.manager.rest.api.services.ActionStatusService;
-import pl.polsl.task.manager.rest.api.services.RoleService;
-import pl.polsl.task.manager.rest.api.services.UserService;
+import pl.polsl.task.manager.rest.api.services.*;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 @Configuration
 public class InitialDataFiller implements ApplicationRunner {
 
-    private final UserService userService;
-    private final RoleService roleService;
-    private final ActionStatusService actionStatusService;
+    private final List<StartUpFiller> startUpFillers = new LinkedList<>();
 
-    public InitialDataFiller(UserService userService, RoleService roleService, ActionStatusService actionStatusService) {
-        this.userService = userService;
-        this.roleService = roleService;
-        this.actionStatusService = actionStatusService;
+    public InitialDataFiller(UserServiceImpl userService, RoleServiceImpl roleService, ActionStatusServiceImpl actionStatusService, ObjectTypeServiceImpl objectTypeService, ActivityTypeServiceImpl activityTypeService) {
+        startUpFillers.addAll(Arrays.asList(userService, roleService, actionStatusService, activityTypeService, objectTypeService));
     }
 
     @Override
     public void run(ApplicationArguments args) {
-        try {
-            roleService.createInitialData();
-        } catch (Exception ignore) {
-        }
-        try {
-            userService.createInitialData();
-        } catch (Exception ignore) {
-        }
-        try {
-            actionStatusService.createInitialData();
-        } catch (Exception ignore) {
-        }
+        for(StartUpFiller startUpFiller: startUpFillers) {
+            try {
+                startUpFiller.createInitialData();
+            } catch (Exception ignore) {
 
+            }
+        }
     }
 
 }

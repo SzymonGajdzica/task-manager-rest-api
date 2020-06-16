@@ -16,7 +16,7 @@ public class ActionMapperImpl implements ActionMapper {
 
     @Override
     public <T extends Action, R extends ActionPatch> void map(R actionPatch, T action) {
-        if (actionPatch.getDescription() != null)
+        if (actionPatch.getHasDescription())
             action.setDescription(actionPatch.getDescription());
     }
 

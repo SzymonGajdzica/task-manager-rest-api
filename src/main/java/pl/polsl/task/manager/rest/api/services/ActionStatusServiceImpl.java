@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class ActionStatusServiceImpl implements ActionStatusService {
+public class ActionStatusServiceImpl implements ActionStatusService, StartUpFiller {
 
     private final StatusRepository statusRepository;
     private final ActionStatusMapper actionStatusMapper;

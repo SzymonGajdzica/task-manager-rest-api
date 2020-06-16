@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class ObjectTypeServiceImpl implements ObjectTypeService {
+public class ObjectTypeServiceImpl implements ObjectTypeService, StartUpFiller {
 
     private final ObjectTypeRepository objectTypeRepository;
     private final AuthenticationService authenticationService;
@@ -60,6 +60,19 @@ public class ObjectTypeServiceImpl implements ObjectTypeService {
         User user = authenticationService.getUserFromToken(token);
         if (!(user instanceof Manager))
             throw new ForbiddenAccessException(Manager.class);
+    }
+
+    @Override
+    public void createInitialData() throws RuntimeException {
+        ObjectType programming = new ObjectType();
+        programming.setCode("PRG");
+        programming.setName("Programing");
+        objectTypeRepository.save(programming);
+
+        ObjectType management = new ObjectType();
+        management.setCode("MAN");
+        management.setName("Management");
+        objectTypeRepository.save(management);
     }
 
 }

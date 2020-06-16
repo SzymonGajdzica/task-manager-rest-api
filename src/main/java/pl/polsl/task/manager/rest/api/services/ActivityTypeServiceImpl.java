@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class ActivityTypeServiceImpl implements ActivityTypeService {
+public class ActivityTypeServiceImpl implements ActivityTypeService, StartUpFiller {
 
     private final ActivityTypeRepository activityTypeRepository;
     private final AuthenticationService authenticationService;
@@ -62,4 +62,21 @@ public class ActivityTypeServiceImpl implements ActivityTypeService {
             throw new ForbiddenAccessException(Manager.class);
     }
 
+    @Override
+    public void createInitialData() throws RuntimeException {
+        ActivityType fix = new ActivityType();
+        fix.setCode("FIX");
+        fix.setName("Fix");
+        activityTypeRepository.save(fix);
+
+        ActivityType test = new ActivityType();
+        test.setCode("TST");
+        test.setName("Test");
+        activityTypeRepository.save(test);
+
+        ActivityType refactor = new ActivityType();
+        refactor.setCode("REF");
+        refactor.setName("Refactor");
+        activityTypeRepository.save(refactor);
+    }
 }

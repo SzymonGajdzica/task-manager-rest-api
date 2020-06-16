@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl implements RoleService, StartUpFiller {
 
     private final RoleRepository roleRepository;
     private final CodeNameMapper codeNameMapper;
